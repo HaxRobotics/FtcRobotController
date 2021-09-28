@@ -8,8 +8,8 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
  * Object to control an intake mechanism
  */
 public class Intake {
-    private CRServo leftServo;
-    private CRServo rightServo;
+    private final CRServo leftServo;
+    private final CRServo rightServo;
 
     /**
      * Construct new Intake
@@ -23,18 +23,26 @@ public class Intake {
         rightServo = hardwareMap.get(CRServo.class, rightServoName);
     }
 
+    // Runs intake to pick up objects
     public void in(double power) {
         leftServo.setPower(-power);
         rightServo.setPower(power);
     }
 
+    // Runs outtake to place down objects
     public void out(double power) {
         leftServo.setPower(power);
         rightServo.setPower(-power);
     }
 
+    // Stops intake/outtake from running
     public void stop() {
         leftServo.setPower(0);
         rightServo.setPower(0);
+    }
+
+    // Checks whether or not the crservos are running
+    public boolean isRunning() {
+        return leftServo.getPower() != 0 && rightServo.getPower() != 0;
     }
 }

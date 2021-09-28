@@ -13,14 +13,19 @@ public class IntakeTest extends OpMode {
 
     @Override
     public void loop() {
-        if (gamepad2.left_bumper) {
-            intake.in(1);
-        }
         if (gamepad2.right_bumper) {
-            intake.out(1);
+            if (intake.isRunning()) {
+                intake.stop();
+            } else {
+                intake.out(1);
+            }
         }
-        if (gamepad2.a) {
-            intake.stop();
+        if (gamepad2.left_bumper) {
+            if (intake.isRunning()) {
+                intake.stop();
+            } else {
+                intake.in(1);
+            }
         }
     }
 }
