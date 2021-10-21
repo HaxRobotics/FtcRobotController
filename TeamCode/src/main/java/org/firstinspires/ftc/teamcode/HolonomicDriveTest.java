@@ -18,6 +18,12 @@ public class HolonomicDriveTest extends OpMode {
     DcMotor backLeftDrive;
     DcMotor backRightDrive;
 
+    double frontLeftPower = .2;
+    double frontRightPower = .2;
+    double backLeftPower = .2;
+    double backRightPower = .2  ;
+
+
     @Override
     public void init() {
         // initialize drive motors
@@ -27,7 +33,7 @@ public class HolonomicDriveTest extends OpMode {
         backRightDrive = hardwareMap.get(DcMotor.class, "backRightDrive");
 
         // initialize drive obj
-        drive = new HolonomicDrive(frontLeftDrive, frontRightDrive, backLeftDrive, backRightDrive);
+        drive = new HolonomicDrive(frontLeftDrive, frontRightDrive, backLeftDrive, backRightDrive, frontLeftPower, frontRightPower, backLeftPower, backRightPower);
     }
 
     @Override
