@@ -8,18 +8,18 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 public class HolonomicDrive {
     //array for motors
     private final DcMotor[] motors;
-    private double multiplier [] ;
+    private final double[] multiplier;
 
 
     //puts motor into the array
     public HolonomicDrive(DcMotor frontLeft, DcMotor frontRight, DcMotor backLeft, DcMotor backRight) {
-        motors = new DcMotor[] {frontLeft, frontRight, backLeft, backRight};
-        multiplier = new double [] {1, 1, 1, 1};
+        motors = new DcMotor[]{frontLeft, frontRight, backLeft, backRight};
+        multiplier = new double[]{1, 1, 1, 1};
     }
 
-    public HolonomicDrive(DcMotor frontLeft, DcMotor frontRight, DcMotor backLeft, DcMotor backRight, Double frontLeftMultiplier, Double frontRightmultiplier, Double backLeftMultiplyer, Double backRightMultiplier) {
-        motors = new DcMotor[] {frontLeft, frontRight, backLeft, backRight};
-        multiplier = new double [] {frontLeftMultiplier, frontRightmultiplier, backLeftMultiplyer, backRightMultiplier};
+    public HolonomicDrive(DcMotor frontLeft, DcMotor frontRight, DcMotor backLeft, DcMotor backRight, double frontLeftMultiplier, double frontRightmultiplier, double backLeftMultiplyer, double backRightMultiplier) {
+        motors = new DcMotor[]{frontLeft, frontRight, backLeft, backRight};
+        multiplier = new double[]{frontLeftMultiplier, frontRightmultiplier, backLeftMultiplyer, backRightMultiplier};
     }
 
     // drive according to controller inputs from driver's sticks
@@ -37,11 +37,11 @@ public class HolonomicDrive {
     //sets motor powers
     public void setPower(double... powers) {
         //checks if array lengths are the same
-        if(powers.length != motors.length) {
+        if (powers.length != motors.length) {
             throw new RuntimeException("array discrepancy when setting motor powers");
         }
         //sets motor power
-        for(int i = 0; i < motors.length; i++) {
+        for (int i = 0; i < motors.length; i++) {
             motors[i].setPower(powers[i] * multiplier[i]);
         }
     }
