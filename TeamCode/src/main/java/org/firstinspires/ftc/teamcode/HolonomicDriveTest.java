@@ -21,7 +21,7 @@ public class HolonomicDriveTest extends OpMode {
     double frontLeftPower = .2;
     double frontRightPower = .2;
     double backLeftPower = .2;
-    double backRightPower = .2  ;
+    double backRightPower = .2;
 
 
     @Override
