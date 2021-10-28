@@ -29,11 +29,17 @@ public class Teleop extends OpMode {
 
     // declare linear slide motor
     DcMotor linearSlide;
+    // declare linear slide elevator servo
+    Servo linearSlideElevator;
     // declare intake servo
     CRServo intakeServo;
     // declare outtake Servo
     Servo outtakeServo;
 
+    // declare booleans for elevator toggle
+    public boolean isY = false;
+    public boolean wasY = false;
+    public boolean elevatorOn = false;
     // declare booleans for outtake toggle
     public boolean isA = false;
     public boolean wasA = false;
@@ -55,6 +61,8 @@ public class Teleop extends OpMode {
 
         // initialize linear slide motor
         linearSlide = hardwareMap.get(DcMotor.class, "linearSlide");
+        // initialize linear slide elevator servo
+        linearSlideElevator = hardwareMap.get(Servo.class, "linearSlideElevator");
         // initialize intake CRServo
         intakeServo = hardwareMap.crservo.get("intakeServo");
         // initialize outtake servo
@@ -64,6 +72,7 @@ public class Teleop extends OpMode {
     public void loop(){
         drive();
         linearSlide();
+        linearSlideElevator();
         intake();
         outtake();
     }
@@ -87,6 +96,21 @@ public class Teleop extends OpMode {
         } else {
             linearSlide.setPower(0);
         }
+    }
+
+    public void linearSlideElevator() {
+        // track history of button
+        if((isY = gamepad1.y) && !wasY) {
+            if(elevatorOn) {
+                // if the servo is on and y is pressed, turn elevator off
+                linearSlideElevator.setPosition(.75);
+            } else {
+                // if the servo is off and y is pressed, turn elevator on
+                linearSlideElevator.setPosition(0);
+            }
+            elevatorOn = !elevatorOn;
+        }
+        wasY = isY;
     }
 
     public void intake() {
