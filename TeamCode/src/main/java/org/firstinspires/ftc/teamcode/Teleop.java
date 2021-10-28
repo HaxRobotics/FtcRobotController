@@ -6,7 +6,7 @@ import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Servo;
 
-// teleop class for robot with the linear slide
+// Teleop class for robot with the linear slide
 @TeleOp
 public class Teleop extends OpMode {
     // threshold used for deadzones on joysticks and making the triggers into buttons
