@@ -45,10 +45,11 @@ public class Teleop extends OpMode {
     public boolean wasA = false;
     public boolean servoOn = false;
 
-    //declares motor powers
+    // declare linear slide motor powers
     final double EXTEND_POWER = .5;
     final double RETRACT_POWER = -.5;
-    //initializes all mechanical components
+
+    // initializes all hardware components
     public void init(){
         // initialize drive motors
         frontLeftDrive = hardwareMap.get(DcMotor.class, "frontLeftDrive");
@@ -68,7 +69,8 @@ public class Teleop extends OpMode {
         // initialize outtake servo
         outtakeServo = hardwareMap.get(Servo.class, "outtakeServo");
     }
-    //calls all methods
+
+    // calls all methods
     public void loop(){
         drive();
         linearSlide();
@@ -76,7 +78,8 @@ public class Teleop extends OpMode {
         intake();
         outtake();
     }
-    //controls wheel motors
+
+    // control drive motors
     public void drive() {
         // set the driver's sticks to correspond with the drive method
         // left stick y = forward/backward; left stick x = strafing; right stick x = turning
@@ -86,9 +89,10 @@ public class Teleop extends OpMode {
 
         drive.drive(forwardPower, strafePower, turnPower);
     }
-    //controls linear slide motor
+
+    // control linear slide motor
     public void linearSlide() {
-        //detects bumpers and sets power
+        // checks if driver's bumpers are pressed and sets power accordingly
         if (gamepad1.right_bumper) {
             linearSlide.setPower(EXTEND_POWER);
         } else if (gamepad1.left_bumper) {
@@ -97,9 +101,10 @@ public class Teleop extends OpMode {
             linearSlide.setPower(0);
         }
     }
-    //controls linear slide's elevation servo on toggle of driver's y
+
+    // controls linear slide's elevation
     public void linearSlideElevator() {
-        // track history of button
+        // track history of driver's y button
         if((isY = gamepad1.y) && !wasY) {
             if(elevatorOn) {
                 // if the servo is on and y is pressed, turn elevator off
@@ -112,9 +117,10 @@ public class Teleop extends OpMode {
         }
         wasY = isY;
     }
-    //controls intake system crservo
+
+    // controls intake system
     public void intake() {
-        //detects button and sets servo power
+        // checks if driver's b/x buttons are pressed and sets crservo power accordingly
         if (gamepad1.b) {
             intakeServo.setPower(1);
         } else if (gamepad1.x) {
@@ -123,15 +129,16 @@ public class Teleop extends OpMode {
             intakeServo.setPower(0);
         }
     }
-    //controls servo for outtake system
+
+    // control outtake system
     public void outtake() {
-        // track history of button
+        // track history of driver's a button
         if((isA = gamepad1.a) && !wasA) {
             if(servoOn) {
-                // if the servo is on and a is pressed, turn shooter off
+                // if the servo is on and a is pressed, turn outtake off
                 outtakeServo.setPosition(.5);
             } else {
-                // if the servo is off and a is pressed, turn shooter on
+                // if the servo is off and a is pressed, turn outtake on
                 outtakeServo.setPosition(1);
             }
             servoOn = !servoOn;
