@@ -48,7 +48,7 @@ public class Teleop extends OpMode {
     //declares motor powers
     final double EXTEND_POWER = .5;
     final double RETRACT_POWER = -.5;
-
+    //initializes all mechanical components
     public void init(){
         // initialize drive motors
         frontLeftDrive = hardwareMap.get(DcMotor.class, "frontLeftDrive");
@@ -68,7 +68,7 @@ public class Teleop extends OpMode {
         // initialize outtake servo
         outtakeServo = hardwareMap.get(Servo.class, "outtakeServo");
     }
-
+    //calls all methods
     public void loop(){
         drive();
         linearSlide();
@@ -76,7 +76,7 @@ public class Teleop extends OpMode {
         intake();
         outtake();
     }
-
+    //controls wheel motors
     public void drive() {
         // set the driver's sticks to correspond with the drive method
         // left stick y = forward/backward; left stick x = strafing; right stick x = turning
@@ -86,7 +86,7 @@ public class Teleop extends OpMode {
 
         drive.drive(forwardPower, strafePower, turnPower);
     }
-
+    //controls linear slide motor
     public void linearSlide() {
         //detects bumpers and sets power
         if (gamepad1.right_bumper) {
@@ -97,7 +97,7 @@ public class Teleop extends OpMode {
             linearSlide.setPower(0);
         }
     }
-
+    //controls linear slide's elevation servo on toggle of driver's y
     public void linearSlideElevator() {
         // track history of button
         if((isY = gamepad1.y) && !wasY) {
@@ -112,8 +112,9 @@ public class Teleop extends OpMode {
         }
         wasY = isY;
     }
-
+    //controls intake system crservo
     public void intake() {
+        //detects button and sets servo power
         if (gamepad1.b) {
             intakeServo.setPower(1);
         } else if (gamepad1.x) {
@@ -122,7 +123,7 @@ public class Teleop extends OpMode {
             intakeServo.setPower(0);
         }
     }
-
+    //controls servo for outtake system
     public void outtake() {
         // track history of button
         if((isA = gamepad1.a) && !wasA) {
