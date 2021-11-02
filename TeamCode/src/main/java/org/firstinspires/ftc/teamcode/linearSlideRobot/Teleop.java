@@ -110,10 +110,10 @@ public class Teleop extends OpMode {
         if((isY = gamepad1.y) && !wasY) {
             if(elevatorOn) {
                 // if the servo is on and y is pressed, turn elevator off
-                linearSlideElevator.setPosition(.75);
+                linearSlideElevator.setPosition(.25);
             } else {
                 // if the servo is off and y is pressed, turn elevator on
-                linearSlideElevator.setPosition(0);
+                linearSlideElevator.setPosition(1);
             }
             elevatorOn = !elevatorOn;
         }
