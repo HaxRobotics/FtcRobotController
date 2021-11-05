@@ -8,7 +8,7 @@ import com.qualcomm.robotcore.hardware.Servo;
 
 import org.firstinspires.ftc.teamcode.HolonomicDrive;
 
-// Teleop class for robot with the linear slide
+// teleop class for robot with the linear slide
 @TeleOp
 public class Teleop extends OpMode {
     // threshold used for deadzones on joysticks and making the triggers into buttons
@@ -18,7 +18,7 @@ public class Teleop extends OpMode {
     HolonomicDrive drive;
 
     // declare drive motors
-    DcMotor frontLeftDrive;
+    /*DcMotor frontLeftDrive;
     DcMotor frontRightDrive;
     DcMotor backLeftDrive;
     DcMotor backRightDrive;
@@ -27,7 +27,7 @@ public class Teleop extends OpMode {
     double frontLeftPower = .2;
     double frontRightPower = .2;
     double backLeftPower = .2;
-    double backRightPower = .2;
+    double backRightPower = .2; */
 
     // declare linear slide motor
     DcMotor linearSlide;
@@ -35,17 +35,11 @@ public class Teleop extends OpMode {
     Servo linearSlideElevator;
     // declare intake servo
     CRServo intakeServo;
-    // declare outtake Servo
-    Servo outtakeServo;
 
     // declare booleans for elevator toggle
     public boolean isY = false;
     public boolean wasY = false;
     public boolean elevatorOn = false;
-    // declare booleans for outtake toggle
-    public boolean isA = false;
-    public boolean wasA = false;
-    public boolean servoOn = false;
 
     // declare linear slide motor powers
     final double EXTEND_POWER = .5;
@@ -54,13 +48,13 @@ public class Teleop extends OpMode {
     // initializes all hardware components
     public void init(){
         // initialize drive motors
-        frontLeftDrive = hardwareMap.get(DcMotor.class, "frontLeftDrive");
+       /* frontLeftDrive = hardwareMap.get(DcMotor.class, "frontLeftDrive");
         frontRightDrive = hardwareMap.get(DcMotor.class, "frontRightDrive");
         backLeftDrive = hardwareMap.get(DcMotor.class, "backLeftDrive");
-        backRightDrive = hardwareMap.get(DcMotor.class, "backRightDrive");
+        backRightDrive = hardwareMap.get(DcMotor.class, "backRightDrive"); */
 
         // initialize drive obj
-        drive = new HolonomicDrive(frontLeftDrive, frontRightDrive, backLeftDrive, backRightDrive, frontLeftPower, frontRightPower, backLeftPower, backRightPower);
+       // drive = new HolonomicDrive(frontLeftDrive, frontRightDrive, backLeftDrive, backRightDrive, frontLeftPower, frontRightPower, backLeftPower, backRightPower);
 
         // initialize linear slide motor
         linearSlide = hardwareMap.get(DcMotor.class, "linearSlide");
@@ -68,21 +62,18 @@ public class Teleop extends OpMode {
         linearSlideElevator = hardwareMap.get(Servo.class, "linearSlideElevator");
         // initialize intake CRServo
         intakeServo = hardwareMap.crservo.get("intakeServo");
-        // initialize outtake servo
-        outtakeServo = hardwareMap.get(Servo.class, "outtakeServo");
     }
 
     // calls all methods
     public void loop(){
-        drive();
+       // drive();
         linearSlide();
         linearSlideElevator();
         intake();
-        outtake();
     }
 
     // control drive motors
-    public void drive() {
+    /*public void drive() {
         // set the driver's sticks to correspond with the drive method
         // left stick y = forward/backward; left stick x = strafing; right stick x = turning
         double forwardPower = Math.abs(gamepad1.left_stick_y) < THRESHOLD ? 0 : gamepad1.left_stick_y;
@@ -90,7 +81,7 @@ public class Teleop extends OpMode {
         double turnPower = Math.abs(gamepad1.right_stick_x) < THRESHOLD ? 0 : gamepad1.right_stick_x;
 
         drive.drive(forwardPower, strafePower, turnPower);
-    }
+    } */
 
     // control linear slide motor
     public void linearSlide() {
@@ -130,21 +121,5 @@ public class Teleop extends OpMode {
         } else {
             intakeServo.setPower(0);
         }
-    }
-
-    // control outtake system
-    public void outtake() {
-        // track history of driver's a button
-        if((isA = gamepad1.a) && !wasA) {
-            if(servoOn) {
-                // if the servo is on and a is pressed, turn outtake off
-                outtakeServo.setPosition(.5);
-            } else {
-                // if the servo is off and a is pressed, turn outtake on
-                outtakeServo.setPosition(1);
-            }
-            servoOn = !servoOn;
-        }
-        wasA = isA;
     }
 }
