@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.linearSlideRobot;
+package org.firstinspires.ftc.teamcode.teleopCode.linearSlideRobot;
 
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;

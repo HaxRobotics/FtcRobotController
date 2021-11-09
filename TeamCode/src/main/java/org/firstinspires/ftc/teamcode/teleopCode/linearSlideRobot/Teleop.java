@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.linearSlideRobot;
+package org.firstinspires.ftc.teamcode.teleopCode.linearSlideRobot;
 
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
@@ -6,7 +6,7 @@ import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Servo;
 
-import org.firstinspires.ftc.teamcode.HolonomicDrive;
+import org.firstinspires.ftc.teamcode.teleopCode.HolonomicDrive;
 
 // teleop class for robot with the linear slide
 @TeleOp
