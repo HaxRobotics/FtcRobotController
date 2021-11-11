@@ -16,11 +16,13 @@ public class ShippingElementDetector extends OpenCvPipeline {
     enum ElementLocation {
         LEFT,
         RIGHT,
-        MIDDLE
+        MIDDLE,
+        NONE
     }
 
     private int width;
     ElementLocation location;
+
     public ShippingElementDetector(int width) {
         this.width = width;
     }
@@ -31,9 +33,15 @@ public class ShippingElementDetector extends OpenCvPipeline {
         Mat mat = new Mat();
         Imgproc.cvtColor(input, mat, Imgproc.COLOR_RGB2HSV);
 
+        // if there isn't anything detected, assume something is wrong
+        if (mat.empty()) {
+            location = ElementLocation.NONE;
+            return input;
+        }
+
         // create an HSV range for neon green to detect shipping element
-        Scalar lowHSV = new Scalar(45.5, 92.2, 100); // lower bound for HSV range
-        Scalar highHSV = new Scalar(55.5, 255, 255); // higher bound for HSV range
+        Scalar lowHSV = new Scalar(50, 100, 100); // lower bound for HSV range
+        Scalar highHSV = new Scalar(60, 255, 255); // higher bound for HSV range
         Mat thresh = new Mat();
 
         // returns a black and white image. The white regions represent the shipping element
