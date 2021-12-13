@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.hardware.VoltageSensor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
@@ -38,7 +39,8 @@ public class Auto extends LinearOpMode {
                 "back left drive",
                 "back right drive"
         );
-        carousel = new Carousel(hardwareMap, "carousel");int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
+        carousel = new Carousel(hardwareMap, "carousel");
+        int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
 
         webcamName = hardwareMap.get(WebcamName.class, "webcam");
         webcam = OpenCvCameraFactory.getInstance().createWebcam(webcamName, cameraMonitorViewId);
@@ -59,8 +61,7 @@ public class Auto extends LinearOpMode {
 
         waitForStart();
 
-        time.reset();
-        while(time.seconds() < 2 && opModeIsActive()){
+        while(time.seconds() < 2) {
             telemetry.addData("position", detector.getLocation());
             if(detector.location == ShippingElementDetector.ElementLocation.LEFT){
                 location = 1;
@@ -72,6 +73,8 @@ public class Auto extends LinearOpMode {
             telemetry.addData("position variable", location);
             telemetry.update();
         }
+
+        webcam.closeCameraDevice();
 
         // drives forward to turning position
         time.reset();
@@ -88,7 +91,8 @@ public class Auto extends LinearOpMode {
         while (time.seconds() < .7 && opModeIsActive()) {
             drive.drive(0, -.6, 0);
         }
-        // drives too carousel with lower speed
+
+        // drives to carousel with lower speed
         time.reset();
         while (time.seconds() < 1.5 && opModeIsActive()) {
             drive.drive(.2, 0, 0);
@@ -107,10 +111,18 @@ public class Auto extends LinearOpMode {
             drive.drive(-.6,0,0);
         }
 
-        // turns 180 degrees to face opposite wall/storage hub
-        time.reset();
-        while (time.seconds() < 1.45 && opModeIsActive()) {
-            drive.drive(0,0,.4);
+        if(getBatteryVoltage() > 13.5) {
+            // turns 180 degrees to face opposite wall/storage hub
+            time.reset();
+            while (time.seconds() < 1.75 && opModeIsActive()) {
+                drive.drive(0,0,.4);
+            }
+        } else {
+            // turns 180 degrees to face opposite wall/storage hub
+            time.reset();
+            while (time.seconds() < 1.45 && opModeIsActive()) {
+                drive.drive(0,0,.4);
+            }
         }
 
         // strafes to line up with storage hub
@@ -124,38 +136,31 @@ public class Auto extends LinearOpMode {
             drive.drive(0,0,0);
         }
 
-        // drives up to storage hub
+        // lifts arm to correct level
         time.reset();
-        while (time.seconds() < .1 && opModeIsActive()) {
-            drive.drive(.6,0,0);
+        while (time.seconds() < 1 && opModeIsActive()) {
+            telemetry.addData("Encoder Pos", arm.armMotor.getCurrentPosition());
+            arm.goTo(location);
+            telemetry.update();
         }
 
-        time.reset();
-        while (time.seconds() < 2 && opModeIsActive()) {
-            drive.drive(0,0,0);
-        }
-
-        // drives up to storage hub
-        /*time.reset();
-        while (time.seconds() < .2 && opModeIsActive()) {
-            drive.drive(.6,0,0);
+        if (getBatteryVoltage() > 13.5) {
+            // drives up to storage hub
+            time.reset();
+            while (time.seconds() < .2 && opModeIsActive()) {
+                drive.drive(.6,0,0);
+            }
+        } else {
+            // drives up to storage hub
+            time.reset();
+            while (time.seconds() < .45 && opModeIsActive()) {
+                drive.drive(.6,0,0);
+            }
         }
 
         time.reset();
         while (time.seconds() < .5 && opModeIsActive()) {
             drive.drive(0,0,0);
-        } */
-
-        // lifts arm to correct level
-        time.reset();
-        while (time.seconds() < 1 && opModeIsActive()) {
-            if(location == 1) {
-                arm.goTo(1);
-            } else if (location == 3) {
-                arm.goTo(3);
-            } else {
-                arm.goTo(2);
-            }
         }
 
         time.reset();
@@ -169,14 +174,52 @@ public class Auto extends LinearOpMode {
             drive.drive(0,0,0);
         }
 
-        time.reset();
-        while(time.seconds() < .2 && opModeIsActive()) {
-            drive.drive(-.6,0,0);
+       if(getBatteryVoltage() > 13.5) {
+           time.reset();
+           while(time.seconds() < .2 && opModeIsActive()) {
+               drive.drive(-.6,0,0);
+           }
+       } else {
+           time.reset();
+           while(time.seconds() < .3 && opModeIsActive()) {
+               drive.drive(-.6,0,0);
+           }
+       }
+
+        if(getBatteryVoltage() > 13.5) {
+            time.reset();
+            while (time.seconds() < 1.25 && opModeIsActive()) {
+                drive.drive(0,.6,0);
+            }
+        } else {
+            time.reset();
+            while (time.seconds() < 1.55 && opModeIsActive()) {
+                drive.drive(0,.6,0);
+            }
         }
 
-        time.reset();
-        while (time.seconds() < 1 && opModeIsActive()) {
-            drive.drive(0,.6,0);
+       if (getBatteryVoltage() > 13.5){
+           time.reset();
+           while (time.seconds() < .1 && opModeIsActive()) {
+               drive.drive(.6,0,0);
+           }
+       } else {
+           time.reset();
+           while (time.seconds() < .2 && opModeIsActive()) {
+               drive.drive(.6,0,0);
+           }
+       }
+    }
+
+    // get battery voltage
+    public double getBatteryVoltage() {
+        double result = Double.POSITIVE_INFINITY;
+        for (VoltageSensor sensor : hardwareMap.voltageSensor) {
+            double voltage = sensor.getVoltage();
+            if (voltage > 0) {
+                result = Math.min(result, voltage);
+            }
         }
+        return result;
     }
 }

@@ -31,6 +31,7 @@ public class FirstFullTeleOp extends OpMode {
 
     @Override
     public void loop() {
+        telemetry.addData("Encoder Pos", arm.armMotor.getCurrentPosition());
         // drive
         drive.teleDrive(
                 -gamepad1.left_stick_y * 0.8,
