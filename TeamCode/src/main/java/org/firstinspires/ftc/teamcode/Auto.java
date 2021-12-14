@@ -138,9 +138,9 @@ public class Auto extends LinearOpMode {
 
         // lifts arm to correct level
         time.reset();
+        arm.goTo(location);
         while (time.seconds() < 1 && opModeIsActive()) {
             telemetry.addData("Encoder Pos", arm.armMotor.getCurrentPosition());
-            arm.goTo(location);
             telemetry.update();
         }
 
