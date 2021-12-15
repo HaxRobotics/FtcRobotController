@@ -49,6 +49,7 @@ public class Auto extends LinearOpMode {
             public void onOpened() {
                 webcam.startStreaming(width, height, OpenCvCameraRotation.UPRIGHT);
             }
+
             @Override
             public void onError(int errorCode) {
                 /*
@@ -61,9 +62,9 @@ public class Auto extends LinearOpMode {
 
         waitForStart();
 
-        while(time.seconds() < 2) {
+        while (time.seconds() < 2) {
             telemetry.addData("position", detector.getLocation());
-            if(detector.location == ShippingElementDetector.ElementLocation.LEFT){
+            if (detector.location == ShippingElementDetector.ElementLocation.LEFT) {
                 location = 1;
             } else if (detector.location == ShippingElementDetector.ElementLocation.RIGHT) {
                 location = 3;
@@ -86,17 +87,28 @@ public class Auto extends LinearOpMode {
         while (time.seconds() < 1.55 && opModeIsActive()) {
             drive.drive(0, 0, .4);
         }
-        // strafes so robot is pointing at carousel; just off the wall
-        time.reset();
-        while (time.seconds() < .7 && opModeIsActive()) {
-            drive.drive(0, -.6, 0);
+        if (getBatteryVoltage() >= 14) {
+            // strafes so robot is pointing at carousel; just off the wall
+            time.reset();
+            while (time.seconds() < .4 && opModeIsActive()) {
+                drive.drive(0, -.6, 0);
+            }
+        } else {
+            // strafes so robot is pointing at carousel; just off the wall
+            time.reset();
+            while (time.seconds() < .7 && opModeIsActive()) {
+                drive.drive(0, -.6, 0);
+            }
         }
 
         // drives to carousel with lower speed
-        time.reset();
-        while (time.seconds() < 1.5 && opModeIsActive()) {
-            drive.drive(.2, 0, 0);
+        if (getBatteryVoltage() <= 13.75) {
+            time.reset();
+            while (time.seconds() < 1.5 && opModeIsActive()) {
+                drive.drive(.2, 0, 0);
+            }
         }
+
         // spins wheel to spin one duck off carousel
         time.reset();
         while (time.seconds() < 2.5 && opModeIsActive()) {
@@ -108,27 +120,46 @@ public class Auto extends LinearOpMode {
         // backs up from carousel
         time.reset();
         while (time.seconds() < .25 && opModeIsActive()) {
-            drive.drive(-.6,0,0);
+            drive.drive(-.6, 0, 0);
         }
 
-        if(getBatteryVoltage() > 13.5) {
+        if (getBatteryVoltage() >= 14) {
+            // turns 180 degrees to face opposite wall/storage hub
+            time.reset();
+            while (time.seconds() < 3.5 && opModeIsActive()) {
+                drive.drive(0, 0, .4);
+            }
+        } else if (getBatteryVoltage() >= 13.75) {
+            // turns 180 degrees to face opposite wall/storage hub
+            time.reset();
+            while (time.seconds() < 3 && opModeIsActive()) {
+                drive.drive(0, 0, .4);
+            }
+        } else if (getBatteryVoltage() >= 13.5) {
             // turns 180 degrees to face opposite wall/storage hub
             time.reset();
             while (time.seconds() < 1.75 && opModeIsActive()) {
-                drive.drive(0,0,.4);
+                drive.drive(0, 0, .4);
             }
         } else {
             // turns 180 degrees to face opposite wall/storage hub
             time.reset();
             while (time.seconds() < 1.45 && opModeIsActive()) {
-                drive.drive(0,0,.4);
+                drive.drive(0, 0, .4);
             }
         }
 
         // strafes to line up with storage hub
-        time.reset();
-        while (time.seconds() < 1.5 && opModeIsActive()) {
-            drive.drive(0,-.6,0);
+        if(getBatteryVoltage() > 13.75) {
+            time.reset();
+            while (time.seconds() < 1.2 && opModeIsActive()) {
+                drive.drive(0,-.6,0);
+            }
+        } else {
+            time.reset();
+            while (time.seconds() < 1.5 && opModeIsActive()) {
+                drive.drive(0,-.6,0);
+            }
         }
 
         time.reset();
@@ -138,10 +169,19 @@ public class Auto extends LinearOpMode {
 
         // lifts arm to correct level
         time.reset();
-        arm.goTo(location);
-        while (time.seconds() < 1 && opModeIsActive()) {
+        while (time.seconds() < 2 && opModeIsActive()) {
             telemetry.addData("Encoder Pos", arm.armMotor.getCurrentPosition());
             telemetry.update();
+            if(location == 1) {
+                arm.goTo(1);
+            } else if(location == 3) {
+                arm.goTo(3);
+            } else {
+                arm.goTo(2);
+            }
+            if(arm.atLevel(location)) {
+                arm.setPower(0);
+            }
         }
 
         if (getBatteryVoltage() > 13.5) {
