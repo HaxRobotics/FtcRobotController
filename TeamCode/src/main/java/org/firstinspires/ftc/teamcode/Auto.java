@@ -87,10 +87,11 @@ public class Auto extends LinearOpMode {
         while (time.seconds() < 1.55 && opModeIsActive()) {
             drive.drive(0, 0, .4);
         }
-        if (getBatteryVoltage() >= 14) {
+
+        if (getBatteryVoltage() >= 13.5) {
             // strafes so robot is pointing at carousel; just off the wall
             time.reset();
-            while (time.seconds() < .4 && opModeIsActive()) {
+            while (time.seconds() < .5 && opModeIsActive()) {
                 drive.drive(0, -.6, 0);
             }
         } else {
@@ -102,7 +103,7 @@ public class Auto extends LinearOpMode {
         }
 
         // drives to carousel with lower speed
-        if (getBatteryVoltage() <= 13.75) {
+        if (getBatteryVoltage() <= 13.5) {
             time.reset();
             while (time.seconds() < 1.5 && opModeIsActive()) {
                 drive.drive(.2, 0, 0);
@@ -118,33 +119,40 @@ public class Auto extends LinearOpMode {
         carousel.stop();
 
         // backs up from carousel
-        time.reset();
-        while (time.seconds() < .25 && opModeIsActive()) {
-            drive.drive(-.6, 0, 0);
+        if (getBatteryVoltage() > 13.3) {
+            time.reset();
+            while (time.seconds() < .1 && opModeIsActive()) {
+                drive.drive(-.6, 0, 0);
+            }
+        } else {
+            time.reset();
+            while (time.seconds() < .25 && opModeIsActive()) {
+                drive.drive(-.6, 0, 0);
+            }
         }
 
         if (getBatteryVoltage() >= 14) {
             // turns 180 degrees to face opposite wall/storage hub
             time.reset();
-            while (time.seconds() < 3.5 && opModeIsActive()) {
+            while (time.seconds() < 2.1 && opModeIsActive()) {
                 drive.drive(0, 0, .4);
             }
         } else if (getBatteryVoltage() >= 13.75) {
             // turns 180 degrees to face opposite wall/storage hub
             time.reset();
-            while (time.seconds() < 3 && opModeIsActive()) {
+            while (time.seconds() < 2 && opModeIsActive()) {
                 drive.drive(0, 0, .4);
             }
         } else if (getBatteryVoltage() >= 13.5) {
             // turns 180 degrees to face opposite wall/storage hub
             time.reset();
-            while (time.seconds() < 1.75 && opModeIsActive()) {
+            while (time.seconds() < 1.5 && opModeIsActive()) {
                 drive.drive(0, 0, .4);
             }
         } else {
             // turns 180 degrees to face opposite wall/storage hub
             time.reset();
-            while (time.seconds() < 1.45 && opModeIsActive()) {
+            while (time.seconds() < 1.25 && opModeIsActive()) {
                 drive.drive(0, 0, .4);
             }
         }
@@ -152,7 +160,7 @@ public class Auto extends LinearOpMode {
         // strafes to line up with storage hub
         if(getBatteryVoltage() > 13.75) {
             time.reset();
-            while (time.seconds() < 1.2 && opModeIsActive()) {
+            while (time.seconds() < 1.3 && opModeIsActive()) {
                 drive.drive(0,-.6,0);
             }
         } else {
@@ -184,16 +192,16 @@ public class Auto extends LinearOpMode {
             }
         }
 
-        if (getBatteryVoltage() > 13.5) {
+        if (getBatteryVoltage() > 13.3) {
             // drives up to storage hub
             time.reset();
-            while (time.seconds() < .2 && opModeIsActive()) {
+            while (time.seconds() < .3 && opModeIsActive()) {
                 drive.drive(.6,0,0);
             }
         } else {
             // drives up to storage hub
             time.reset();
-            while (time.seconds() < .45 && opModeIsActive()) {
+            while (time.seconds() < .6 && opModeIsActive()) {
                 drive.drive(.6,0,0);
             }
         }
@@ -226,7 +234,7 @@ public class Auto extends LinearOpMode {
            }
        }
 
-        if(getBatteryVoltage() > 13.5) {
+        if(getBatteryVoltage() > 13.3) {
             time.reset();
             while (time.seconds() < 1.25 && opModeIsActive()) {
                 drive.drive(0,.6,0);
@@ -238,14 +246,14 @@ public class Auto extends LinearOpMode {
             }
         }
 
-       if (getBatteryVoltage() > 13.5){
+       if (getBatteryVoltage() > 13.6){
            time.reset();
-           while (time.seconds() < .1 && opModeIsActive()) {
+           while (time.seconds() < .35 && opModeIsActive()) {
                drive.drive(.6,0,0);
            }
        } else {
            time.reset();
-           while (time.seconds() < .2 && opModeIsActive()) {
+           while (time.seconds() < .4 && opModeIsActive()) {
                drive.drive(.6,0,0);
            }
        }
