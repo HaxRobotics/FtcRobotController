@@ -20,7 +20,7 @@ public class ShippingElementDetector extends OpenCvPipeline {
         NONE
     }
 
-    private int width;
+    private final int width;
     ElementLocation location;
 
     public ShippingElementDetector(int width) {

@@ -11,7 +11,7 @@ import org.openftc.easyopencv.OpenCvCameraRotation;
 
 @Autonomous
 public class DetectElement extends LinearOpMode {
-    private ElapsedTime runtime = new ElapsedTime();
+    private final ElapsedTime runtime = new ElapsedTime();
     int width = 352;
     int height = 288;
     // store as variable here so we can access the location

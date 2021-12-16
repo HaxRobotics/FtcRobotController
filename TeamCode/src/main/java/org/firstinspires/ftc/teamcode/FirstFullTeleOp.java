@@ -2,8 +2,11 @@ package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.DcMotorSimple;
+
+import org.firstinspires.ftc.teamcode.objectClasses.Arm;
+import org.firstinspires.ftc.teamcode.objectClasses.Carousel;
+import org.firstinspires.ftc.teamcode.objectClasses.DriveTrain;
+import org.firstinspires.ftc.teamcode.objectClasses.Intake;
 
 @TeleOp
 public class FirstFullTeleOp extends OpMode {
