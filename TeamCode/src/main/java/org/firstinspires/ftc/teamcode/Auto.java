@@ -77,33 +77,33 @@ public class Auto extends LinearOpMode {
 
         webcam.closeCameraDevice();
 
-        // drives forward to turning position
-        time.reset();
-        while (time.seconds() < .3 && opModeIsActive()) {
-            drive.drive(.6, 0, 0);
+        if(getBatteryVoltage() < 13.8) {
+            // drives forward to turning position
+            time.reset();
+            while (time.seconds() < .3 && opModeIsActive()) {
+                drive.drive(.6, 0, 0);
+            }
+        } else {
+            time.reset();
+            while (time.seconds() < .2 && opModeIsActive()) {
+                drive.drive(.6, 0, 0);
+            }
         }
+
         // turns 180 degrees so robot faces towards wall
         time.reset();
-        while (time.seconds() < 1.55 && opModeIsActive()) {
+        while (time.seconds() < 1.45 && opModeIsActive()) {
             drive.drive(0, 0, .4);
         }
 
-        if (getBatteryVoltage() >= 13.3) {
-            // strafes so robot is pointing at carousel; just off the wall
-            time.reset();
-            while (time.seconds() < .425 && opModeIsActive()) {
-                drive.drive(0, -.6, 0);
-            }
-        } else {
-            // strafes so robot is pointing at carousel; just off the wall
-            time.reset();
-            while (time.seconds() < .7 && opModeIsActive()) {
-                drive.drive(0, -.6, 0);
-            }
+        // strafes so robot is pointing at carousel; just off the wall
+        time.reset();
+        while (time.seconds() < .7 && opModeIsActive()) {
+            drive.drive(0, -.6, 0);
         }
 
-        // drives to carousel with lower speed
-        if (getBatteryVoltage() <= 13.15) {
+        if(getBatteryVoltage() < 13.8) {
+            // drives to carousel with lower speed
             time.reset();
             while (time.seconds() < 1.5 && opModeIsActive()) {
                 drive.drive(.2, 0, 0);
@@ -134,13 +134,13 @@ public class Auto extends LinearOpMode {
         if (getBatteryVoltage() >= 14) {
             // turns 180 degrees to face opposite wall/storage hub
             time.reset();
-            while (time.seconds() < 2.1 && opModeIsActive()) {
+            while (time.seconds() < 2.3 && opModeIsActive()) {
                 drive.drive(0, 0, .4);
             }
-        } else if (getBatteryVoltage() >= 13.75) {
+        } else if (getBatteryVoltage() >= 13.675) {
             // turns 180 degrees to face opposite wall/storage hub
             time.reset();
-            while (time.seconds() < 2 && opModeIsActive()) {
+            while (time.seconds() < 1.6 && opModeIsActive()) {
                 drive.drive(0, 0, .4);
             }
         } else if (getBatteryVoltage() >= 13.5) {
@@ -152,7 +152,7 @@ public class Auto extends LinearOpMode {
         } else {
             // turns 180 degrees to face opposite wall/storage hub
             time.reset();
-            while (time.seconds() < 1.35 && opModeIsActive()) {
+            while (time.seconds() < 1.4 && opModeIsActive()) {
                 drive.drive(0, 0, .4);
             }
         }
@@ -192,7 +192,7 @@ public class Auto extends LinearOpMode {
             }
         }
 
-        if (getBatteryVoltage() > 13.3) {
+        if (getBatteryVoltage() > 13.4) {
             // drives up to storage hub
             time.reset();
             while (time.seconds() < .35 && opModeIsActive()) {
@@ -253,7 +253,7 @@ public class Auto extends LinearOpMode {
            }
        } else {
            time.reset();
-           while (time.seconds() < .2 && opModeIsActive()) {
+           while (time.seconds() < .25 && opModeIsActive()) {
                drive.drive(.6,0,0);
            }
        }
