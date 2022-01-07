@@ -4,8 +4,6 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import java.util.ArrayList;
-//TODO: Merge modes
-//TODO: Try RUN_TO_POSITION again, tune PIDF coefficients
 public class Arm {
     private final DcMotor armMotor;
     // positions of arm
@@ -57,6 +55,9 @@ public class Arm {
         // if command is given when we are within tolerance, just stop the motor
         if (atLevel(level)) {
             armMotor.setPower(0);
+            return;
+        }
+        if (targetLevel == level) {
             return;
         }
         targetLevel = level;

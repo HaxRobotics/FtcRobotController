@@ -28,13 +28,17 @@ public class Intake {
         leftServo.setPower(-power);
         rightServo.setPower(power);
     }
-
+    public void in() {
+        in(1);
+    }
     // Runs outtake to place down objects
     public void out(double power) {
         leftServo.setPower(power);
         rightServo.setPower(-power);
     }
-
+    public void out() {
+        out(1);
+    }
     // Stops intake/outtake from running
     public void stop() {
         leftServo.setPower(0);

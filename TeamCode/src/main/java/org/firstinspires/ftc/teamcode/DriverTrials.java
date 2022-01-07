@@ -2,13 +2,9 @@ package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.DcMotorSimple;
-
-import org.firstinspires.ftc.teamcode.gamepad.ToggleButtonReader;
 
 @TeleOp
-public class FirstFullTeleOp extends OpMode {
+public class DriverTrials extends OpMode {
     DriveTrain drive;
     Arm arm;
     Intake intake;
@@ -22,9 +18,9 @@ public class FirstFullTeleOp extends OpMode {
         intake = new Intake(hardwareMap, "left intake", "right intake");
 
         drive = new DriveTrain(hardwareMap,
-                 "front left drive",
+                "front left drive",
                 "front right drive",
-                 "back left drive",
+                "back left drive",
                 "back right drive"
         );
         carousel = new Carousel(hardwareMap, "carousel");
@@ -32,29 +28,25 @@ public class FirstFullTeleOp extends OpMode {
 
     @Override
     public void loop() {
-        // drive
         drive.teleDrive(
                 -gamepad1.left_stick_y * 0.8,
                 gamepad1.left_stick_x * 0.8,
                 gamepad1.right_stick_x * 0.8);
 
-        if (gamepad2.a) {
+        if (gamepad1.a) {
             arm.goTo(0);
-        } else if (gamepad2.b) {
+        } else if (gamepad1.b) {
             arm.goTo(1);
-        } else if (gamepad2.x) {
+        } else if (gamepad1.x) {
             arm.goTo(2);
-        } else if (gamepad2.y) {
+        } else if (gamepad1.y) {
             arm.goTo(3);
-        } else {
-            arm.setPower(-gamepad2.left_stick_y);
         }
         arm.update();
 
-        // intake
-        if (gamepad2.right_bumper) {
+        if (gamepad1.right_bumper) {
             intake.out();
-        } else if (gamepad2.left_bumper) {
+        } else if (gamepad1.left_bumper) {
             intake.in();
         } else {
             intake.stop();
