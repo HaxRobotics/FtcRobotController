@@ -51,19 +51,21 @@ public class ShippingElementDetector extends OpenCvPipeline {
         // edge detection
         Mat edges = new Mat();
         Imgproc.Canny(thresh, edges, 100, 300);
-
+        thresh.release();
         // oftentimes the edges are disconnected, findContours connects these edges
         // then find the bounding rectangles of those contours
         List<MatOfPoint> contours = new ArrayList<>();
         Mat hierarchy = new Mat();
         Imgproc.findContours(edges, contours, hierarchy, Imgproc.RETR_TREE, Imgproc.CHAIN_APPROX_SIMPLE);
-
-        MatOfPoint2f[] contoursPoly  = new MatOfPoint2f[contours.size()];
+        hierarchy.release();
+        edges.release();
+        MatOfPoint2f contoursPoly;
         Rect[] boundRect = new Rect[contours.size()];
         for (int i = 0; i < contours.size(); i++) {
-            contoursPoly[i] = new MatOfPoint2f();
-            Imgproc.approxPolyDP(new MatOfPoint2f(contours.get(i).toArray()), contoursPoly[i], 3, true);
-            boundRect[i] = Imgproc.boundingRect(new MatOfPoint(contoursPoly[i].toArray()));
+            contoursPoly = new MatOfPoint2f();
+            Imgproc.approxPolyDP(new MatOfPoint2f(contours.get(i).toArray()), contoursPoly, 3, true);
+            boundRect[i] = Imgproc.boundingRect(new MatOfPoint(contoursPoly.toArray()));
+            contoursPoly.release();
         }
 
         // iterate and check whether the bounding boxes cover left and/or right side of the image
