@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode;
 
+import com.qualcomm.hardware.rev.RevBlinkinLedDriver;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.VoltageSensor;
@@ -24,6 +25,11 @@ import org.openftc.easyopencv.OpenCvCameraRotation;
 
 @Autonomous
 public class RedAuto extends LinearOpMode {
+    // declare LED patterns
+    final RevBlinkinLedDriver.BlinkinPattern LEFT_PATTERN = RevBlinkinLedDriver.BlinkinPattern.GREEN;
+    final RevBlinkinLedDriver.BlinkinPattern MIDDLE_PATTERN = RevBlinkinLedDriver.BlinkinPattern.RED;
+    final RevBlinkinLedDriver.BlinkinPattern RIGHT_PATTERN = RevBlinkinLedDriver.BlinkinPattern.BLUE;
+
     // declare vision variables
     int width = 352;
     int height = 288;
@@ -38,6 +44,7 @@ public class RedAuto extends LinearOpMode {
     OpenCvCamera webcam;
     ShippingElementDetector detector = new ShippingElementDetector(width);
     ElapsedTime time = new ElapsedTime();
+    RevBlinkinLedDriver blinkin;
 
     public void runOpMode() throws InterruptedException {
         // initialize necessary objects
@@ -74,6 +81,8 @@ public class RedAuto extends LinearOpMode {
         // call waitForStart()
         waitForStart();
 
+        blinkin = hardwareMap.get(RevBlinkinLedDriver.class, "blinkin");
+
         // detect shipping element and it's location
         /*
             LEFT positioning means location equals one and the block goes on bottom plate
@@ -86,10 +95,13 @@ public class RedAuto extends LinearOpMode {
             telemetry.addData("position", detector.getLocation());
             if (detector.location == ShippingElementDetector.ElementLocation.LEFT) {
                 location = 1;
+                blinkin.setPattern(LEFT_PATTERN);
             } else if (detector.location == ShippingElementDetector.ElementLocation.RIGHT) {
                 location = 3;
+                blinkin.setPattern(RIGHT_PATTERN);
             } else {
                 location = 2;
+                blinkin.setPattern(MIDDLE_PATTERN);
             }
             // update what int location is equal to
             telemetry.addData("position variable", location);

@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode;
 
+import com.qualcomm.hardware.rev.RevBlinkinLedDriver;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
@@ -10,10 +11,13 @@ import org.firstinspires.ftc.teamcode.objectClasses.Intake;
 
 @TeleOp
 public class FirstFullTeleOp extends OpMode {
+    final RevBlinkinLedDriver.BlinkinPattern BLUE_PATTERN = RevBlinkinLedDriver.BlinkinPattern.BLUE;
     DriveTrain drive;
     Arm arm;
     Intake intake;
     Carousel carousel;
+    RevBlinkinLedDriver blinkin;
+
     @Override
     public void init() {
         arm = new Arm(hardwareMap, "arm");
@@ -29,11 +33,14 @@ public class FirstFullTeleOp extends OpMode {
                 "back right drive"
         );
         carousel = new Carousel(hardwareMap, "carousel");
+
+        blinkin = hardwareMap.get(RevBlinkinLedDriver.class, "blinkin");
     }
 
     @Override
     public void loop() {
         telemetry.addData("Encoder Pos", arm.armMotor.getCurrentPosition());
+        blinkin.setPattern(BLUE_PATTERN);
         // drive
         drive.teleDrive(
                 -gamepad1.left_stick_y * 0.8,
