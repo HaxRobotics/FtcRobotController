@@ -14,7 +14,6 @@ public class FirstFullTeleOp extends OpMode {
     Arm arm;
     Intake intake;
     Carousel carousel;
-    boolean wasLeftStick, isLeftStick;
     @Override
     public void init() {
         arm = new Arm(hardwareMap, "arm");

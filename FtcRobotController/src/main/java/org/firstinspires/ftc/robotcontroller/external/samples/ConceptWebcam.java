@@ -74,7 +74,6 @@ import java.util.concurrent.TimeUnit;
  * using Media Transfer; ADB; etc)
  */
 @TeleOp(name="Concept: Webcam", group ="Concept")
-@Disabled
 public class ConceptWebcam extends LinearOpMode {
 
     //----------------------------------------------------------------------------------------------
@@ -115,7 +114,7 @@ public class ConceptWebcam extends LinearOpMode {
         callbackHandler = CallbackLooper.getDefault().getHandler();
 
         cameraManager = ClassFactory.getInstance().getCameraManager();
-        cameraName = hardwareMap.get(WebcamName.class, "Webcam 1");
+        cameraName = hardwareMap.get(WebcamName.class, "webcam");
 
         initializeFrameQueue(2);
         AppUtil.getInstance().ensureDirectoryExists(captureDirectory);
