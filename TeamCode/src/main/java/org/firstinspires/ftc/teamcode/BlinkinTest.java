@@ -6,6 +6,7 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
+import org.firstinspires.ftc.teamcode.objectClasses.LEDStrip;
 import org.openftc.easyopencv.OpenCvCamera;
 import org.openftc.easyopencv.OpenCvCameraFactory;
 import org.openftc.easyopencv.OpenCvCameraRotation;
@@ -18,8 +19,7 @@ public class BlinkinTest extends OpMode {
 
     OpenCvCamera webcam;
     ShippingElementDetector detector;
-    ContourPipeline pipeline;
-    RevBlinkinLedDriver blinkin;
+    LEDStrip strip;
     @Override
     public void init() {
         // for live preview in driver station
@@ -42,26 +42,12 @@ public class BlinkinTest extends OpMode {
         detector = new ShippingElementDetector(352);
         webcam.setPipeline(detector);
 
-
-        blinkin = hardwareMap.get(RevBlinkinLedDriver.class, "blinkin");
-
+        strip = new LEDStrip(hardwareMap, "blinkin", LEDStrip.Alliance.RED);
     }
 
     @Override
     public void loop() {
         telemetry.addData("Detected Position", detector.location);
-        switch (detector.location) {
-            case LEFT:
-                blinkin.setPattern(LEFT_PATTERN);
-                break;
-            case MIDDLE:
-                blinkin.setPattern(MIDDLE_PATTERN);
-                break;
-            case RIGHT:
-                blinkin.setPattern(RIGHT_PATTERN);
-                break;
-            case NONE:
-                break;
-        }
+        strip.detected(detector.location);
     }
 }

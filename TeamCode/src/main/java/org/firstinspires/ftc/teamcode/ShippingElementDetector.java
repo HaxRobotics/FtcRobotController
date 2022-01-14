@@ -13,16 +13,23 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ShippingElementDetector extends OpenCvPipeline {
-    enum ElementLocation {
-        LEFT,
-        RIGHT,
-        MIDDLE,
-        NONE
+    public enum ElementLocation {
+        LEFT(1),
+        MIDDLE(2),
+        RIGHT(3),
+        NONE(0);
+
+        public int val;
+
+
+        ElementLocation(int i) {
+            val = i;
+        }
     }
 
     private final int width;
     ElementLocation location = ElementLocation.NONE;
-
+    Mat mat = new Mat();
     public ShippingElementDetector(int width) {
         this.width = width;
     }
@@ -30,7 +37,6 @@ public class ShippingElementDetector extends OpenCvPipeline {
     @Override
     public Mat processFrame(Mat input) {
         // Make a working copy of the input matrix in HSV
-        Mat mat = new Mat();
         Imgproc.cvtColor(input, mat, Imgproc.COLOR_RGB2HSV);
 
         // if there isn't anything detected, assume something is wrong
@@ -64,6 +70,7 @@ public class ShippingElementDetector extends OpenCvPipeline {
         for (int i = 0; i < contours.size(); i++) {
             contoursPoly = new MatOfPoint2f();
             Imgproc.approxPolyDP(new MatOfPoint2f(contours.get(i).toArray()), contoursPoly, 3, true);
+            contours.get(i).release();
             boundRect[i] = Imgproc.boundingRect(new MatOfPoint(contoursPoly.toArray()));
             contoursPoly.release();
         }
@@ -73,12 +80,14 @@ public class ShippingElementDetector extends OpenCvPipeline {
         double right_x = 0.75 * width;
         boolean left = false; // true if regular stone found on the left side
         boolean right = false; // "" "" on the right side
+        boolean middle = false;
         for (int i = 0; i != boundRect.length; i++) {
             if (boundRect[i].x < left_x)
                 left = true;
             if (boundRect[i].x + boundRect[i].width > right_x)
                 right = true;
-
+            if (boundRect[i].x > left_x && boundRect[i].width < right_x)
+                middle = true;
             // draw red bounding rectangles on mat, the mat has been converted to HSV
             // so we need to use HSV as well
             Imgproc.rectangle(mat, boundRect[i], new Scalar(0.5, 76.9, 89.8));
@@ -90,8 +99,10 @@ public class ShippingElementDetector extends OpenCvPipeline {
             location = ElementLocation.LEFT;
         } else if (right && !left) {
             location = ElementLocation.RIGHT;
-        } else {
+        } else if (middle) {
             location = ElementLocation.MIDDLE;
+        } else {
+            location = ElementLocation.RIGHT;
         }
 
         return mat; // return the mat with rectangles drawn
@@ -99,5 +110,9 @@ public class ShippingElementDetector extends OpenCvPipeline {
 
     public ElementLocation getLocation() {
         return this.location;
+    }
+
+    public int getLocationInt() {
+        return location.val;
     }
 }

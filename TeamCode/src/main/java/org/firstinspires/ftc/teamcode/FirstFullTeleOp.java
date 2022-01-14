@@ -1,23 +1,32 @@
 package org.firstinspires.ftc.teamcode;
 
+import com.acmerobotics.dashboard.FtcDashboard;
+import com.acmerobotics.dashboard.canvas.Canvas;
+import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
+import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.qualcomm.hardware.rev.RevBlinkinLedDriver;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
+import org.firstinspires.ftc.teamcode.drive.StandardTrackingWheelLocalizer;
 import org.firstinspires.ftc.teamcode.objectClasses.Arm;
 import org.firstinspires.ftc.teamcode.objectClasses.Carousel;
 import org.firstinspires.ftc.teamcode.objectClasses.DriveTrain;
 import org.firstinspires.ftc.teamcode.objectClasses.Intake;
+import org.firstinspires.ftc.teamcode.objectClasses.LEDStrip;
+import org.firstinspires.ftc.teamcode.util.DashboardUtil;
 
 @TeleOp
 public class FirstFullTeleOp extends OpMode {
+    StandardTrackingWheelLocalizer localizer;
     final RevBlinkinLedDriver.BlinkinPattern BLUE_PATTERN = RevBlinkinLedDriver.BlinkinPattern.BLUE;
     DriveTrain drive;
     Arm arm;
     Intake intake;
     Carousel carousel;
-    RevBlinkinLedDriver blinkin;
-
+    LEDStrip strip;
+    boolean first = true;
+    FtcDashboard dashboard;
     @Override
     public void init() {
         arm = new Arm(hardwareMap, "arm");
@@ -34,13 +43,27 @@ public class FirstFullTeleOp extends OpMode {
         );
         carousel = new Carousel(hardwareMap, "carousel");
 
-        blinkin = hardwareMap.get(RevBlinkinLedDriver.class, "blinkin");
+        strip = new LEDStrip(hardwareMap, "blinkin", LEDStrip.Alliance.RED);
+        strip.allianceSolid();
+        localizer = new StandardTrackingWheelLocalizer(hardwareMap);
+        localizer.setPoseEstimate(new Pose2d(-34, 63.5, Math.toRadians(270)));
+        dashboard = FtcDashboard.getInstance();
     }
 
     @Override
     public void loop() {
+        localizer.update();
+        Pose2d pose = localizer.getPoseEstimate();
+        TelemetryPacket packet = new TelemetryPacket();
+        Canvas canvas = packet.fieldOverlay();
+
+        DashboardUtil.drawRobot(canvas, pose);
+        dashboard.sendTelemetryPacket(packet);
+
+        telemetry.addData("x", pose.getX());
+        telemetry.addData("y", pose.getY());
+        telemetry.addData("heading", pose.getHeading());
         telemetry.addData("Encoder Pos", arm.armMotor.getCurrentPosition());
-        blinkin.setPattern(BLUE_PATTERN);
         // drive
         drive.teleDrive(
                 -gamepad1.left_stick_y * 0.8,
@@ -74,6 +97,11 @@ public class FirstFullTeleOp extends OpMode {
             carousel.start();
         } else {
             carousel.stop();
+        }
+
+        if (getRuntime() > 90 && first) {
+            strip.allianceBlink();
+            first = false;
         }
     }
 }

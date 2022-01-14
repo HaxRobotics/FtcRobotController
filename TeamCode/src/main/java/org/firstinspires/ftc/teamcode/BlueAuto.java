@@ -11,6 +11,7 @@ import org.firstinspires.ftc.teamcode.objectClasses.Arm;
 import org.firstinspires.ftc.teamcode.objectClasses.Carousel;
 import org.firstinspires.ftc.teamcode.objectClasses.DriveTrain;
 import org.firstinspires.ftc.teamcode.objectClasses.Intake;
+import org.firstinspires.ftc.teamcode.objectClasses.LEDStrip;
 import org.openftc.easyopencv.OpenCvCamera;
 import org.openftc.easyopencv.OpenCvCameraFactory;
 import org.openftc.easyopencv.OpenCvCameraRotation;
@@ -42,9 +43,9 @@ public class BlueAuto extends LinearOpMode {
     WebcamName webcamName;
     OpenCvCamera webcam;
     ShippingElementDetector detector = new ShippingElementDetector(width);
-    ElapsedTime time = new ElapsedTime();
-    RevBlinkinLedDriver blinkin;
 
+    LEDStrip strip;
+    ElapsedTime time = new ElapsedTime();
     public void runOpMode() throws InterruptedException {
         // initialize necessary objects
         drive = new DriveTrain(hardwareMap,
@@ -80,7 +81,7 @@ public class BlueAuto extends LinearOpMode {
         // call waitForStart()
         waitForStart();
 
-        blinkin = hardwareMap.get(RevBlinkinLedDriver.class, "blinkin");
+        strip = new LEDStrip(hardwareMap, "blinkin", LEDStrip.Alliance.BLUE);
 
         // detect shipping element and it's location
         /*
@@ -94,17 +95,15 @@ public class BlueAuto extends LinearOpMode {
             telemetry.addData("position", detector.getLocation());
             if (detector.location == ShippingElementDetector.ElementLocation.LEFT) {
                 location = 1;
-                blinkin.setPattern(LEFT_PATTERN);
             } else if (detector.location == ShippingElementDetector.ElementLocation.RIGHT) {
                 location = 3;
-                blinkin.setPattern(RIGHT_PATTERN);
             } else {
                 location = 2;
-                blinkin.setPattern((MIDDLE_PATTERN));
             }
             // update what int location is equal to
             telemetry.addData("position variable", location);
             telemetry.update();
+            strip.detected(detector.location);
         }
 
         // close camera after location variable is set above

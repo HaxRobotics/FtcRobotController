@@ -21,6 +21,7 @@ import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.hardware.lynx.LynxModule;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.PIDFCoefficients;
 import com.qualcomm.robotcore.hardware.VoltageSensor;
@@ -52,10 +53,10 @@ import static org.firstinspires.ftc.teamcode.drive.DriveConstants.kV;
  */
 @Config
 public class SampleMecanumDrive extends MecanumDrive {
-    public static PIDCoefficients TRANSLATIONAL_PID = new PIDCoefficients(0, 0, 0);
-    public static PIDCoefficients HEADING_PID = new PIDCoefficients(0, 0, 0);
+    public static PIDCoefficients TRANSLATIONAL_PID = new PIDCoefficients(10, 0, 0);
+    public static PIDCoefficients HEADING_PID = new PIDCoefficients(13, 0, 0);
 
-    public static double LATERAL_MULTIPLIER = 1;
+    public static double LATERAL_MULTIPLIER = 1.7;
 
     public static double VX_WEIGHT = 1;
     public static double VY_WEIGHT = 1;
@@ -71,7 +72,6 @@ public class SampleMecanumDrive extends MecanumDrive {
     private DcMotorEx leftFront, leftRear, rightRear, rightFront;
     private List<DcMotorEx> motors;
 
-    private BNO055IMU imu;
     private VoltageSensor batteryVoltageSensor;
 
     public SampleMecanumDrive(HardwareMap hardwareMap) {
@@ -89,10 +89,6 @@ public class SampleMecanumDrive extends MecanumDrive {
         }
 
         // TODO: adjust the names of the following hardware devices to match your configuration
-        imu = hardwareMap.get(BNO055IMU.class, "imu");
-        BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
-        parameters.angleUnit = BNO055IMU.AngleUnit.RADIANS;
-        imu.initialize(parameters);
 
         // TODO: If the hub containing the IMU you are using is mounted so that the "REV" logo does
         // not face up, remap the IMU axes so that the z-axis points upward (normal to the floor.)
@@ -119,7 +115,7 @@ public class SampleMecanumDrive extends MecanumDrive {
         leftFront = hardwareMap.get(DcMotorEx.class, "front left drive");
         leftRear = hardwareMap.get(DcMotorEx.class, "back left drive");
         rightRear = hardwareMap.get(DcMotorEx.class, "back right drive ");
-        rightFront = hardwareMap.get(DcMotorEx.class, "front right drve");
+        rightFront = hardwareMap.get(DcMotorEx.class, "front right drive");
 
         motors = Arrays.asList(leftFront, leftRear, rightRear, rightFront);
 
@@ -295,18 +291,8 @@ public class SampleMecanumDrive extends MecanumDrive {
     }
 
     @Override
-    public double getRawExternalHeading() {
-        return imu.getAngularOrientation().firstAngle;
-    }
-
-    @Override
     public Double getExternalHeadingVelocity() {
-        // To work around an SDK bug, use -zRotationRate in place of xRotationRate
-        // and -xRotationRate in place of zRotationRate (yRotationRate behaves as 
-        // expected). This bug does NOT affect orientation. 
-        //
-        // See https://github.com/FIRST-Tech-Challenge/FtcRobotController/issues/251 for details.
-        return (double) -imu.getAngularVelocity().xRotationRate;
+        return 0.0;
     }
 
     public static TrajectoryVelocityConstraint getVelocityConstraint(double maxVel, double maxAngularVel, double trackWidth) {
@@ -318,5 +304,10 @@ public class SampleMecanumDrive extends MecanumDrive {
 
     public static TrajectoryAccelerationConstraint getAccelerationConstraint(double maxAccel) {
         return new ProfileAccelerationConstraint(maxAccel);
+    }
+
+    @Override
+    protected double getRawExternalHeading() {
+        return 0;
     }
 }

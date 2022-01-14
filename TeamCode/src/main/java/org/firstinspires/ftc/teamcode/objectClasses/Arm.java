@@ -4,6 +4,8 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import java.util.ArrayList;
+import java.util.function.IntSupplier;
+
 //TODO: Merge modes
 //TODO: Try RUN_TO_POSITION again, tune PIDF coefficients
 public class Arm {
@@ -67,7 +69,9 @@ public class Arm {
         armMotor.setPower(direction);
 
     }
-
+    public void goTo(IntSupplier supplier) {
+        goTo(supplier.getAsInt());
+    }
     // check if arm is at target, stopping it if it is
     public void update() {
         if (targetLevel == -1) {
