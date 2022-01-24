@@ -85,6 +85,23 @@ public class WarehouseAuto extends OpMode {
                 .strafeTo(new Vector2d(41, 61))
                 .lineToSplineHeading(new Pose2d(41, 54, 0))
                 .addTemporalMarker(() -> arm.goTo(0))
+                .lineToSplineHeading(new Pose2d(53, 54, Math.toRadians(30)))
+                .addTemporalMarker(() -> intake.in(1))
+                .waitSeconds(0.5)
+                .addTemporalMarker(() -> arm.goTo(1))
+                .waitSeconds(1)
+                .lineToSplineHeading(new Pose2d(41, 54, 0))
+                .lineToSplineHeading(new Pose2d(41, 61, Math.toRadians(270)))
+                .strafeTo(new Vector2d(12, 62))
+                .lineToSplineHeading(new Pose2d(12, 24, Math.toRadians(180)))
+                .addTemporalMarker(() -> arm.goTo(detector::getLocationInt))
+                .waitSeconds(1)
+                .lineTo(new Vector2d(1.74, 24))
+                .addTemporalMarker(() -> intake.out(1))
+                .waitSeconds(0.5)
+                .strafeTo(new Vector2d(12, 59))
+                .lineToSplineHeading(new Pose2d(12, 62, Math.toRadians(270)))
+                .strafeTo(new Vector2d(41, 61))
 
                 .build();
 

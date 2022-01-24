@@ -8,23 +8,43 @@ import com.noahbres.meepmeep.roadrunner.entity.RoadRunnerBotEntity;
 
 public class MeepMeepTesting {
     public static void main(String[] args) {
+        Pose2d startPose = new Pose2d(12, 62, Math.toRadians(270));
         MeepMeep meepMeep = new MeepMeep(800);
-
-        Pose2d startPose = new Pose2d(-34, 62.5, Math.toRadians(270));
 
         RoadRunnerBotEntity bot = new DefaultBotBuilder(meepMeep)
                 .setConstraints(50, 20, Math.toRadians(360), Math.toRadians(60), 15)
                 .followTrajectorySequence(drive ->
                         drive.trajectorySequenceBuilder(startPose)
-                                .forward(10)
-                                .turn(Math.toRadians(180 - 1e-6))
-                                .strafeTo(new Vector2d(-57, 56))
-                                .strafeTo(new Vector2d(-13, 57))
-                                .turn(Math.toRadians(180 - 1e-6))
-                                .lineToConstantHeading(new Vector2d(-12, 43.5))
-                                .strafeTo(new Vector2d(-56, 39))
-                                .build()
-                );
+                                .lineToSplineHeading(new Pose2d(12, 24, Math.toRadians(180)))
+                                //.addTemporalMarker(() -> arm.goTo(detector::getLocationInt))
+                                .waitSeconds(1)
+                                .lineTo(new Vector2d(1.74, 24))
+                                //.addTemporalMarker(() -> intake.out(1))
+                                .waitSeconds(0.5)
+                                .strafeTo(new Vector2d(12, 59))
+                                .lineToSplineHeading(new Pose2d(12, 62, Math.toRadians(270)))
+                                .strafeTo(new Vector2d(41, 61))
+                                .lineToSplineHeading(new Pose2d(41, 54, 0))
+                                //.addTemporalMarker(() -> arm.goTo(0))
+                                .lineToSplineHeading(new Pose2d(53, 54, Math.toRadians(30)))
+                                //.addTemporalMarker(() -> intake.in(1))
+                                .waitSeconds(0.5)
+                                //.addTemporalMarker(() -> arm.goTo(1))
+                                .waitSeconds(1)
+                                .lineToSplineHeading(new Pose2d(41, 54, 0))
+                                .lineToSplineHeading(new Pose2d(41, 61, Math.toRadians(270)))
+                                .strafeTo(new Vector2d(12, 62))
+                                .lineToSplineHeading(new Pose2d(12, 24, Math.toRadians(180)))
+                                //.addTemporalMarker(() -> arm.goTo(detector::getLocationInt))
+                                .waitSeconds(1)
+                                .lineTo(new Vector2d(1.74, 24))
+                                //.addTemporalMarker(() -> intake.out(1))
+                                .waitSeconds(0.5)
+                                .strafeTo(new Vector2d(12, 59))
+                                .lineToSplineHeading(new Pose2d(12, 62, Math.toRadians(270)))
+                                .strafeTo(new Vector2d(41, 61))
+
+                                .build());
 
         meepMeep.setBackground(MeepMeep.Background.FIELD_FREIGHTFRENZY_ADI_DARK)
                 .setDarkMode(true)
