@@ -8,8 +8,9 @@ import com.noahbres.meepmeep.roadrunner.entity.RoadRunnerBotEntity;
 
 public class MeepMeepTesting {
     public static void main(String[] args) {
-        Pose2d startPose = new Pose2d(-34, 62.5, Math.toRadians(270));
         MeepMeep meepMeep = new MeepMeep(800);
+
+        Pose2d startPose = new Pose2d(-34, 62.5, Math.toRadians(270));
 
         RoadRunnerBotEntity bot = new DefaultBotBuilder(meepMeep)
                 .setConstraints(50, 20, Math.toRadians(360), Math.toRadians(60), 15)

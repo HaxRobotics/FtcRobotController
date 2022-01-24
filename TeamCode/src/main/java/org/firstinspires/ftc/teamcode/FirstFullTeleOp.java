@@ -107,18 +107,15 @@ public class FirstFullTeleOp extends OpMode {
             carousel.start();
         } else if (gamepad2.left_trigger > 0) {
             carousel.redStart();
-        } else {
-            carousel.stop();
-        }
-
-
-        if (gamepad1.right_trigger > 0) {
+        } else if (gamepad1.right_trigger > 0) {
             carousel.start();
         } else if (gamepad1.left_trigger > 0) {
             carousel.redStart();
         } else {
             carousel.stop();
         }
+
+
 
         // Shipping element
         if (gamepad2.dpad_up) {
