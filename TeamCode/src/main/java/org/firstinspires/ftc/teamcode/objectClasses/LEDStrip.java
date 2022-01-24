@@ -25,7 +25,7 @@ public class LEDStrip {
     // blinkin led driver
     // COLOR 1 is set as RED and COLOR 2 is set as BLUE
     private final RevBlinkinLedDriver blinkin;
-    private final Alliance alliance;
+    public Alliance alliance;
 
     public LEDStrip(HardwareMap hw, String driverName, Alliance alliance) {
         blinkin = hw.get(RevBlinkinLedDriver.class, driverName);

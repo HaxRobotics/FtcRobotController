@@ -7,6 +7,8 @@ import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.qualcomm.hardware.rev.RevBlinkinLedDriver;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.CRServo;
+import com.qualcomm.robotcore.hardware.DcMotor;
 
 import org.firstinspires.ftc.teamcode.drive.StandardTrackingWheelLocalizer;
 import org.firstinspires.ftc.teamcode.objectClasses.Arm;
@@ -16,7 +18,7 @@ import org.firstinspires.ftc.teamcode.objectClasses.Intake;
 import org.firstinspires.ftc.teamcode.objectClasses.LEDStrip;
 import org.firstinspires.ftc.teamcode.util.DashboardUtil;
 
-@TeleOp
+@TeleOp(name = "COMP TELEOP")
 public class FirstFullTeleOp extends OpMode {
     StandardTrackingWheelLocalizer localizer;
     final RevBlinkinLedDriver.BlinkinPattern BLUE_PATTERN = RevBlinkinLedDriver.BlinkinPattern.BLUE;
@@ -27,6 +29,7 @@ public class FirstFullTeleOp extends OpMode {
     LEDStrip strip;
     boolean first = true;
     FtcDashboard dashboard;
+    CRServo hook;
     @Override
     public void init() {
         arm = new Arm(hardwareMap, "arm");
@@ -46,13 +49,20 @@ public class FirstFullTeleOp extends OpMode {
         strip = new LEDStrip(hardwareMap, "blinkin", LEDStrip.Alliance.RED);
         strip.allianceSolid();
         localizer = new StandardTrackingWheelLocalizer(hardwareMap);
-        localizer.setPoseEstimate(new Pose2d(-34, 63.5, Math.toRadians(270)));
+        localizer.setPoseEstimate(new Pose2d(12, 62, Math.toRadians(270)));
         dashboard = FtcDashboard.getInstance();
+        hook = hardwareMap.get(CRServo.class, "hook");
     }
 
     @Override
     public void loop() {
+        if (gamepad1.left_stick_button) {
+            strip.alliance = LEDStrip.Alliance.BLUE;
+        } else if (gamepad1.right_stick_button) {
+            strip.alliance = LEDStrip.Alliance.RED;
+        }
         localizer.update();
+
         Pose2d pose = localizer.getPoseEstimate();
         TelemetryPacket packet = new TelemetryPacket();
         Canvas canvas = packet.fieldOverlay();
@@ -93,12 +103,35 @@ public class FirstFullTeleOp extends OpMode {
         }
 
         // carousel
-        if (gamepad1.right_trigger > 0) {
+        if (gamepad2.right_trigger > 0) {
             carousel.start();
+        } else if (gamepad2.left_trigger > 0) {
+            carousel.redStart();
         } else {
             carousel.stop();
         }
 
+
+        if (gamepad1.right_trigger > 0) {
+            carousel.start();
+        } else if (gamepad1.left_trigger > 0) {
+            carousel.redStart();
+        } else {
+            carousel.stop();
+        }
+
+        // Shipping element
+        if (gamepad2.dpad_up) {
+            hook.setPower(-1);
+        } else if (gamepad2.dpad_down) {
+            hook.setPower(1);
+        } else {
+            hook.setPower(0);
+        }
+        if (gamepad2.right_stick_button) {
+            arm.armMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+            arm.armMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        }
         if (getRuntime() > 90 && first) {
             strip.allianceBlink();
             first = false;

@@ -18,7 +18,15 @@ public class Carousel {
     public void start() {
         carouselMotor.setVelocity(toggleSpeed);
     }
-
+    public void redStart() {
+        carouselMotor.setVelocity(-toggleSpeed);
+    }
+    public void startPower(double power) {
+        carouselMotor.setPower(power);
+    }
+    public void redStartPower(double power) {
+        startPower(-power);
+    }
     public void stop() {
         carouselMotor.setVelocity(0);
     }
