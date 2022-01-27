@@ -10,6 +10,7 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
 
+import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.teamcode.drive.StandardTrackingWheelLocalizer;
 import org.firstinspires.ftc.teamcode.objectClasses.Arm;
 import org.firstinspires.ftc.teamcode.objectClasses.Carousel;
@@ -17,11 +18,16 @@ import org.firstinspires.ftc.teamcode.objectClasses.DriveTrain;
 import org.firstinspires.ftc.teamcode.objectClasses.Intake;
 import org.firstinspires.ftc.teamcode.objectClasses.LEDStrip;
 import org.firstinspires.ftc.teamcode.util.DashboardUtil;
+import org.openftc.easyopencv.OpenCvCamera;
+import org.openftc.easyopencv.OpenCvCameraFactory;
+import org.openftc.easyopencv.OpenCvCameraRotation;
 
 @TeleOp(name = "COMP TELEOP")
 public class FirstFullTeleOp extends OpMode {
+    int width = 352;
+    int height = 288;
+
     StandardTrackingWheelLocalizer localizer;
-    final RevBlinkinLedDriver.BlinkinPattern BLUE_PATTERN = RevBlinkinLedDriver.BlinkinPattern.BLUE;
     DriveTrain drive;
     Arm arm;
     Intake intake;
@@ -30,6 +36,8 @@ public class FirstFullTeleOp extends OpMode {
     boolean first = true;
     FtcDashboard dashboard;
     CRServo hook;
+    ShippingElementDetector detector;
+    OpenCvCamera webcam;
     @Override
     public void init() {
         arm = new Arm(hardwareMap, "arm");
@@ -50,16 +58,39 @@ public class FirstFullTeleOp extends OpMode {
         strip.allianceSolid();
         localizer = new StandardTrackingWheelLocalizer(hardwareMap);
         localizer.setPoseEstimate(new Pose2d(12, 62, Math.toRadians(270)));
+        detector = new ShippingElementDetector(width);
+
+        int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
+
+        webcam = OpenCvCameraFactory.getInstance().createWebcam(hardwareMap.get(WebcamName.class, "webcam"), cameraMonitorViewId);
+        webcam.openCameraDeviceAsync(new OpenCvCamera.AsyncCameraOpenListener() {
+            @Override
+            public void onOpened() {
+                webcam.startStreaming(width, height, OpenCvCameraRotation.UPRIGHT);
+            }
+
+            @Override
+            public void onError(int errorCode) {
+                // empty
+            }
+        });
+
+        // set opencv pipeline
+        webcam.setPipeline(detector);
+
         dashboard = FtcDashboard.getInstance();
         hook = hardwareMap.get(CRServo.class, "hook");
     }
 
     @Override
     public void loop() {
+        telemetry.addData("Location", detector.getLocation().name());
         if (gamepad1.left_stick_button) {
             strip.alliance = LEDStrip.Alliance.BLUE;
         } else if (gamepad1.right_stick_button) {
             strip.alliance = LEDStrip.Alliance.RED;
+        } else if (gamepad1.dpad_up) {
+            strip.setPattern(RevBlinkinLedDriver.BlinkinPattern.BLACK);
         }
         localizer.update();
 

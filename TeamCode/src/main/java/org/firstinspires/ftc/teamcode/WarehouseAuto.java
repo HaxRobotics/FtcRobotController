@@ -2,23 +2,22 @@ package org.firstinspires.ftc.teamcode;
 
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.acmerobotics.roadrunner.geometry.Vector2d;
-import com.qualcomm.hardware.rev.RevBlinkinLedDriver;
+import com.acmerobotics.roadrunner.trajectory.constraints.MecanumVelocityConstraint;
+import com.acmerobotics.roadrunner.trajectory.constraints.ProfileAccelerationConstraint;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
-import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 
-import org.apache.commons.math3.stat.descriptive.moment.VectorialCovariance;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.teamcode.drive.SampleMecanumDrive;
 import org.firstinspires.ftc.teamcode.objectClasses.Arm;
 import org.firstinspires.ftc.teamcode.objectClasses.Carousel;
-import org.firstinspires.ftc.teamcode.objectClasses.DriveTrain;
 import org.firstinspires.ftc.teamcode.objectClasses.Intake;
 import org.firstinspires.ftc.teamcode.objectClasses.LEDStrip;
 import org.firstinspires.ftc.teamcode.trajectorysequence.TrajectorySequence;
 import org.openftc.easyopencv.OpenCvCamera;
 import org.openftc.easyopencv.OpenCvCameraFactory;
 import org.openftc.easyopencv.OpenCvCameraRotation;
+
 @Autonomous(name = "BLUE AUTO WAREHOUSE")
 public class WarehouseAuto extends OpMode {
 
@@ -74,35 +73,55 @@ public class WarehouseAuto extends OpMode {
     public void init() {
         initRobot();
         trajSeq = drive.trajectorySequenceBuilder(startPose)
-                .lineToSplineHeading(new Pose2d(12, 24, Math.toRadians(180)))
+                //drive to the shipping hub
+                .addTemporalMarker(() -> webcam.stopStreaming())
+                .lineToLinearHeading(new Pose2d(12, 24, Math.toRadians(180)))
+                //move arm to correct level
                 .addTemporalMarker(() -> arm.goTo(detector::getLocationInt))
                 .waitSeconds(1)
+                //position closer to the shipping hub
                 .lineTo(new Vector2d(1.74, 24))
+                //release the preloaded block
                 .addTemporalMarker(() -> intake.out(1))
                 .waitSeconds(0.5)
-                .strafeTo(new Vector2d(12, 59))
-                .lineToSplineHeading(new Pose2d(12, 62, Math.toRadians(270)))
-                .strafeTo(new Vector2d(41, 61))
-                .lineToSplineHeading(new Pose2d(41, 54, 0))
+                .addTemporalMarker(() -> intake.stop())
+                //go back to start position
+                .lineToLinearHeading(new Pose2d(12, 63, Math.toRadians(270)))
+                //strafe into warehouse
+                .setVelConstraint(new MecanumVelocityConstraint(30, 15))
+                .setAccelConstraint(new ProfileAccelerationConstraint(12))
+                .strafeTo(new Vector2d(41, 63))
+                .resetConstraints()
+                //lower arm to lowest level
                 .addTemporalMarker(() -> arm.goTo(0))
-                .lineToSplineHeading(new Pose2d(53, 54, Math.toRadians(30)))
+                .waitSeconds(1.25)
+                //turn on the intake to pick up a block
                 .addTemporalMarker(() -> intake.in(1))
-                .waitSeconds(0.5)
+                //drive closer to the pile of blocks
+                .lineToLinearHeading(new Pose2d(51, 57.5, Math.toRadians(0)))
+                .waitSeconds(0.75)
+                .addTemporalMarker(() -> intake.stop())
+                //raise the arm to cross the barrier
                 .addTemporalMarker(() -> arm.goTo(1))
-                .waitSeconds(1)
-                .lineToSplineHeading(new Pose2d(41, 54, 0))
-                .lineToSplineHeading(new Pose2d(41, 61, Math.toRadians(270)))
-                .strafeTo(new Vector2d(12, 62))
-                .lineToSplineHeading(new Pose2d(12, 24, Math.toRadians(180)))
+                //drive back to start position
+                .lineToLinearHeading(new Pose2d(41, 63, Math.toRadians(270)))
+                .strafeTo(new Vector2d(12, 63))
+                //drive to shipping hub
+                .lineToLinearHeading(new Pose2d(12, 24, Math.toRadians(180)))
+                //move arm to correct level
                 .addTemporalMarker(() -> arm.goTo(detector::getLocationInt))
                 .waitSeconds(1)
+                //position closer to the shipping hub
                 .lineTo(new Vector2d(1.74, 24))
+                //release block
                 .addTemporalMarker(() -> intake.out(1))
                 .waitSeconds(0.5)
-                .strafeTo(new Vector2d(12, 59))
-                .lineToSplineHeading(new Pose2d(12, 62, Math.toRadians(270)))
-                .strafeTo(new Vector2d(41, 61))
-
+                .addTemporalMarker(() -> intake.stop())
+                //return to start position
+                .lineToSplineHeading(new Pose2d(12, 63, Math.toRadians(270)))
+                //drive into warehouse
+                .setVelConstraint(new MecanumVelocityConstraint(30, 15))
+                .strafeTo(new Vector2d(41, 63))
                 .build();
 
     }
@@ -113,11 +132,11 @@ public class WarehouseAuto extends OpMode {
     }
     @Override
     public void start() {
-        arm.goTo(1);
         drive.followTrajectorySequenceAsync(trajSeq);
     }
     @Override
     public void loop() {
+        strip.detected(detector.getLocation());
         drive.update();
         arm.update();
     }
