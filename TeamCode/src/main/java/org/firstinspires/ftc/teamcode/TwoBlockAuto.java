@@ -18,8 +18,9 @@ import org.openftc.easyopencv.OpenCvCamera;
 import org.openftc.easyopencv.OpenCvCameraFactory;
 import org.openftc.easyopencv.OpenCvCameraRotation;
 
-@Autonomous()
-public class WarehouseAuto extends OpMode {
+@Autonomous(name = "2 Block Warehouse")
+public class TwoBlockAuto extends OpMode {
+
     // declare vision variables
     int width = 352;
     int height = 288;
@@ -85,20 +86,42 @@ public class WarehouseAuto extends OpMode {
                 .waitSeconds(0.5)
                 .addTemporalMarker(() -> intake.stop())
                 //go back to start position
-                .lineToLinearHeading(new Pose2d(12, 64, Math.toRadians(270)))
+                .lineToLinearHeading(new Pose2d(12, 63, Math.toRadians(270)))
                 //strafe into warehouse
                 .setVelConstraint(new MecanumVelocityConstraint(30, 15))
-                .setAccelConstraint(new ProfileAccelerationConstraint(15))
-                .strafeTo(new Vector2d(41, 64))
+                .setAccelConstraint(new ProfileAccelerationConstraint(12))
+                .strafeTo(new Vector2d(41, 63))
                 .resetConstraints()
                 //lower arm to lowest level
                 .addTemporalMarker(() -> arm.goTo(0))
-                .addTemporalMarker(() -> intake.in(1))
                 .waitSeconds(1.25)
+                //turn on the intake to pick up a block
+                .addTemporalMarker(() -> intake.in(1))
                 //drive closer to the pile of blocks
-                .lineToLinearHeading(new Pose2d(52.5, 57.5, Math.toRadians(25)))
-                .waitSeconds(1.5)
+                .lineToLinearHeading(new Pose2d(51, 57.5, Math.toRadians(0)))
+                .waitSeconds(0.75)
                 .addTemporalMarker(() -> intake.stop())
+                //raise the arm to cross the barrier
+                .addTemporalMarker(() -> arm.goTo(1))
+                //drive back to start position
+                .lineToLinearHeading(new Pose2d(41, 63, Math.toRadians(270)))
+                .strafeTo(new Vector2d(12, 63))
+                //drive to shipping hub
+                .lineToLinearHeading(new Pose2d(12, 24, Math.toRadians(180)))
+                //move arm to correct level
+                .addTemporalMarker(() -> arm.goTo(detector::getLocationInt))
+                .waitSeconds(1)
+                //position closer to the shipping hub
+                .lineTo(new Vector2d(1.74, 24))
+                //release block
+                .addTemporalMarker(() -> intake.out(1))
+                .waitSeconds(0.5)
+                .addTemporalMarker(() -> intake.stop())
+                //return to start position
+                .lineToSplineHeading(new Pose2d(12, 63, Math.toRadians(270)))
+                //drive into warehouse
+                .setVelConstraint(new MecanumVelocityConstraint(30, 15))
+                .strafeTo(new Vector2d(41, 63))
                 .build();
 
     }
