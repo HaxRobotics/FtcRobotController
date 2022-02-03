@@ -1,4 +1,6 @@
-package org.firstinspires.ftc.teamcode.objectClasses;
+package org.firstinspires.ftc.teamcode.subsystems;
+
+import androidx.annotation.NonNull;
 
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
@@ -12,12 +14,15 @@ public class DriveTrain {
     DcMotor backLeft;
     DcMotor backRight;
 
-    public DriveTrain(HardwareMap hw, String frontLeftName, String frontRightName, String backLeftName, String backRightName) {
+    public DriveTrain(@NonNull HardwareMap hw, String frontLeftName, String frontRightName, String backLeftName,
+            String backRightName) {
+        // get motors
         frontLeft = hw.get(DcMotor.class, frontLeftName);
         frontRight = hw.get(DcMotor.class, frontRightName);
-        frontRight.setDirection(DcMotorSimple.Direction.REVERSE);
         backLeft = hw.get(DcMotor.class, backLeftName);
         backRight = hw.get(DcMotor.class, backRightName);
+        // necessary for mecanum drive
+        frontRight.setDirection(DcMotorSimple.Direction.REVERSE);
         backRight.setDirection(DcMotorSimple.Direction.REVERSE);
 
         frontLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
@@ -32,6 +37,7 @@ public class DriveTrain {
         this.backLeft = backLeft;
         this.backRight = backRight;
     }
+
     private void normalize(double[] wheelSpeeds) {
         // find max magnitude power
         double maxMagnitude = Arrays.stream(wheelSpeeds).map(Math::abs).max().orElse(1);
@@ -42,20 +48,22 @@ public class DriveTrain {
             }
         }
     }
+
     public void teleDrive(double forward, double strafe, double rotate) {
         drive(squareInput(forward), squareInput(strafe), squareInput(rotate));
     }
+
     public void drive(double forward, double strafe, double rotate) {
         double[] wheelSpeeds = {
-                        // front left
-                        forward + strafe + rotate,
-                        // front right
-                        forward - strafe - rotate,
-                        // back left
-                        forward - strafe + rotate,
-                        // back right
-                        forward + strafe - rotate
-                };
+                // front left
+                forward + strafe + rotate,
+                // front right
+                forward - strafe - rotate,
+                // back left
+                forward - strafe + rotate,
+                // back right
+                forward + strafe - rotate
+        };
 
         // normalize powers
         normalize(wheelSpeeds);
@@ -66,6 +74,7 @@ public class DriveTrain {
         backLeft.setPower(wheelSpeeds[2]);
         backRight.setPower(wheelSpeeds[3]);
     }
+
     /**
      * Square magnitude of number while keeping the sign.
      */

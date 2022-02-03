@@ -9,16 +9,17 @@ import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.teamcode.drive.SampleMecanumDrive;
-import org.firstinspires.ftc.teamcode.objectClasses.Arm;
-import org.firstinspires.ftc.teamcode.objectClasses.Carousel;
-import org.firstinspires.ftc.teamcode.objectClasses.Intake;
-import org.firstinspires.ftc.teamcode.objectClasses.LEDStrip;
+import org.firstinspires.ftc.teamcode.subsystems.Arm;
+import org.firstinspires.ftc.teamcode.subsystems.Carousel;
+import org.firstinspires.ftc.teamcode.subsystems.Intake;
+import org.firstinspires.ftc.teamcode.subsystems.LEDStrip;
+import org.firstinspires.ftc.teamcode.subsystems.ShippingElementDetector;
 import org.firstinspires.ftc.teamcode.trajectorysequence.TrajectorySequence;
 import org.openftc.easyopencv.OpenCvCamera;
 import org.openftc.easyopencv.OpenCvCameraFactory;
 import org.openftc.easyopencv.OpenCvCameraRotation;
 
-@Autonomous()
+@Autonomous(name = "BLUE COMP WAREHOUSE")
 public class WarehouseAuto extends OpMode {
     // declare vision variables
     int width = 352;
@@ -46,7 +47,8 @@ public class WarehouseAuto extends OpMode {
         intake = new Intake(hardwareMap, "left intake", "right intake");
         carousel = new Carousel(hardwareMap, "carousel");
 
-        int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
+        int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id",
+                hardwareMap.appContext.getPackageName());
 
         webcamName = hardwareMap.get(WebcamName.class, "webcam");
         webcam = OpenCvCameraFactory.getInstance().createWebcam(webcamName, cameraMonitorViewId);
@@ -72,6 +74,8 @@ public class WarehouseAuto extends OpMode {
     public void init() {
         initRobot();
         trajSeq = drive.trajectorySequenceBuilder(startPose)
+                .addTemporalMarker(() -> arm.goTo(3))
+                .waitSeconds(3.5)
                 //drive to the shipping hub
                 .addTemporalMarker(() -> webcam.stopStreaming())
                 .lineToLinearHeading(new Pose2d(12, 24, Math.toRadians(180)))
@@ -100,20 +104,23 @@ public class WarehouseAuto extends OpMode {
                 .waitSeconds(1.5)
                 .addTemporalMarker(() -> intake.stop())
                 .build();
-
     }
+
     @Override
     public void init_loop() {
         strip.detected(detector.getLocation());
         telemetry.addData("Location", detector.getLocation().name());
     }
+
     @Override
     public void start() {
         drive.followTrajectorySequenceAsync(trajSeq);
     }
+
     @Override
     public void loop() {
         strip.detected(detector.getLocation());
+        telemetry.addData("Location", detector.getLocation().name());
         drive.update();
         arm.update();
     }

@@ -1,8 +1,6 @@
 package org.firstinspires.ftc.teamcode;
 
 import com.acmerobotics.dashboard.FtcDashboard;
-import com.acmerobotics.dashboard.canvas.Canvas;
-import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.qualcomm.hardware.rev.RevBlinkinLedDriver;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
@@ -12,12 +10,12 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.teamcode.drive.StandardTrackingWheelLocalizer;
-import org.firstinspires.ftc.teamcode.objectClasses.Arm;
-import org.firstinspires.ftc.teamcode.objectClasses.Carousel;
-import org.firstinspires.ftc.teamcode.objectClasses.DriveTrain;
-import org.firstinspires.ftc.teamcode.objectClasses.Intake;
-import org.firstinspires.ftc.teamcode.objectClasses.LEDStrip;
-import org.firstinspires.ftc.teamcode.util.DashboardUtil;
+import org.firstinspires.ftc.teamcode.subsystems.Arm;
+import org.firstinspires.ftc.teamcode.subsystems.Carousel;
+import org.firstinspires.ftc.teamcode.subsystems.DriveTrain;
+import org.firstinspires.ftc.teamcode.subsystems.Intake;
+import org.firstinspires.ftc.teamcode.subsystems.LEDStrip;
+import org.firstinspires.ftc.teamcode.subsystems.ShippingElementDetector;
 import org.openftc.easyopencv.OpenCvCamera;
 import org.openftc.easyopencv.OpenCvCameraFactory;
 import org.openftc.easyopencv.OpenCvCameraRotation;
@@ -38,6 +36,10 @@ public class FirstFullTeleOp extends OpMode {
     CRServo hook;
     ShippingElementDetector detector;
     OpenCvCamera webcam;
+    double multiplier = 0.8;
+    private boolean isSlow = false;
+    private boolean wasSlow = false;
+
     @Override
     public void init() {
         arm = new Arm(hardwareMap, "arm");
@@ -47,9 +49,9 @@ public class FirstFullTeleOp extends OpMode {
         intake = new Intake(hardwareMap, "left intake", "right intake");
 
         drive = new DriveTrain(hardwareMap,
-                 "front left drive",
+                "front left drive",
                 "front right drive",
-                 "back left drive",
+                "back left drive",
                 "back right drive"
         );
         carousel = new Carousel(hardwareMap, "carousel");
@@ -60,9 +62,11 @@ public class FirstFullTeleOp extends OpMode {
         localizer.setPoseEstimate(new Pose2d(12, 62, Math.toRadians(270)));
         detector = new ShippingElementDetector(width);
 
-        int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
+        int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id",
+                hardwareMap.appContext.getPackageName());
 
-        webcam = OpenCvCameraFactory.getInstance().createWebcam(hardwareMap.get(WebcamName.class, "webcam"), cameraMonitorViewId);
+        webcam = OpenCvCameraFactory.getInstance().createWebcam(hardwareMap.get(WebcamName.class, "webcam"),
+                cameraMonitorViewId);
         webcam.openCameraDeviceAsync(new OpenCvCamera.AsyncCameraOpenListener() {
             @Override
             public void onOpened() {
@@ -85,6 +89,7 @@ public class FirstFullTeleOp extends OpMode {
     @Override
     public void loop() {
         telemetry.addData("Location", detector.getLocation().name());
+        // LED control
         if (gamepad1.left_stick_button) {
             strip.alliance = LEDStrip.Alliance.BLUE;
         } else if (gamepad1.right_stick_button) {
@@ -92,14 +97,9 @@ public class FirstFullTeleOp extends OpMode {
         } else if (gamepad1.dpad_up) {
             strip.setPattern(RevBlinkinLedDriver.BlinkinPattern.BLACK);
         }
+
         localizer.update();
-
         Pose2d pose = localizer.getPoseEstimate();
-        TelemetryPacket packet = new TelemetryPacket();
-        Canvas canvas = packet.fieldOverlay();
-
-        DashboardUtil.drawRobot(canvas, pose);
-        dashboard.sendTelemetryPacket(packet);
 
         telemetry.addData("x", pose.getX());
         telemetry.addData("y", pose.getY());
@@ -107,10 +107,10 @@ public class FirstFullTeleOp extends OpMode {
         telemetry.addData("Encoder Pos", arm.armMotor.getCurrentPosition());
         // drive
         drive.teleDrive(
-                -gamepad1.left_stick_y * 0.8,
-                gamepad1.left_stick_x * 0.8,
-                gamepad1.right_stick_x * 0.8);
-
+                -gamepad1.left_stick_y * multiplier,
+                gamepad1.left_stick_x * multiplier,
+                gamepad1.right_stick_x * multiplier);
+        // arm
         if (gamepad2.a) {
             arm.goTo(0);
         } else if (gamepad2.b) {
@@ -146,8 +146,11 @@ public class FirstFullTeleOp extends OpMode {
             carousel.stop();
         }
 
-
-
+        // slow mode
+        if ((isSlow = gamepad1.dpad_down) && !wasSlow) {
+            multiplier = multiplier == 0.4 ? 0.8 : 0.4;
+        }
+        wasSlow = isSlow;
         // Shipping element
         if (gamepad2.dpad_up) {
             hook.setPower(-1);
@@ -156,10 +159,12 @@ public class FirstFullTeleOp extends OpMode {
         } else {
             hook.setPower(0);
         }
+        // operator reset for arm
         if (gamepad2.right_stick_button) {
             arm.armMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
             arm.armMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         }
+        // blink during endgame
         if (getRuntime() > 90 && first) {
             strip.allianceBlink();
             first = false;

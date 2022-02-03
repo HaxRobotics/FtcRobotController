@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode;
+package org.firstinspires.ftc.teamcode.subsystems;
 
 import org.opencv.core.Core;
 import org.opencv.core.Mat;
@@ -13,22 +13,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ShippingElementDetector extends OpenCvPipeline {
-    public enum ElementLocation {
-        LEFT(1),
-        MIDDLE(2),
-        RIGHT(3),
-        NONE(0);
-
-        public int val;
-
-
-        ElementLocation(int i) {
-            val = i;
-        }
-    }
-
     private final int width;
-    ElementLocation location = ElementLocation.NONE;
+    private ElementLocation location = ElementLocation.NONE;
     Mat mat = new Mat();
     public ShippingElementDetector(int width) {
         this.width = width;
@@ -76,18 +62,16 @@ public class ShippingElementDetector extends OpenCvPipeline {
         }
 
         // iterate and check whether the bounding boxes cover left and/or right side of the image
-        double left_x = 0.25 * width;
-        double right_x = 0.75 * width;
+        double mid_x = 0.5 * width;
         boolean left = false; // true if regular stone found on the left side
-        boolean right = false; // "" "" on the right side
-        boolean middle = false;
+        boolean middle = false; // "" "" on the right side
         for (int i = 0; i != boundRect.length; i++) {
-            if (boundRect[i].x < left_x)
+            if (boundRect[i].x < mid_x) {
                 left = true;
-            if (boundRect[i].x + boundRect[i].width > right_x)
-                right = true;
-            if (boundRect[i].x > left_x && boundRect[i].width < right_x)
+            }
+            if (boundRect[i].x + boundRect[i].width > mid_x && boundRect[i].x < 0.8 * width) {
                 middle = true;
+            }
             // draw red bounding rectangles on mat, the mat has been converted to HSV
             // so we need to use HSV as well
             Imgproc.rectangle(mat, boundRect[i], new Scalar(0.5, 76.9, 89.8));
@@ -95,11 +79,9 @@ public class ShippingElementDetector extends OpenCvPipeline {
 
         // if there is neon green on a side, that side should be the element
         // if both are false or both are true, then element must be in the middle
-        if (left && !right) {
+        if (left && !middle) {
             location = ElementLocation.LEFT;
-        } else if (right && !left) {
-            location = ElementLocation.RIGHT;
-        } else if (middle) {
+        } else if (middle && !left) {
             location = ElementLocation.MIDDLE;
         } else {
             location = ElementLocation.RIGHT;
@@ -114,5 +96,23 @@ public class ShippingElementDetector extends OpenCvPipeline {
 
     public int getLocationInt() {
         return location.val;
+    }
+
+    public enum ElementLocation {
+        LEFT(1),
+        MIDDLE(2),
+        RIGHT(3),
+        NONE(0);
+
+        int val;
+
+
+        ElementLocation(int i) {
+            val = i;
+        }
+
+        public int val() {
+            return val;
+        }
     }
 }

@@ -1,4 +1,6 @@
-package org.firstinspires.ftc.teamcode.objectClasses;
+package org.firstinspires.ftc.teamcode.subsystems;
+
+import androidx.annotation.NonNull;
 
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
@@ -6,8 +8,6 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 import java.util.ArrayList;
 import java.util.function.IntSupplier;
 
-//TODO: Merge modes
-//TODO: Try RUN_TO_POSITION again, tune PIDF coefficients
 public class Arm {
     public final DcMotor armMotor;
     // positions of arm
@@ -17,7 +17,7 @@ public class Arm {
     // most recent target level
     private int targetLevel = 0;
 
-    public Arm(HardwareMap hw, String motorName) {
+    public Arm(@NonNull HardwareMap hw, String motorName) {
         armMotor = hw.get(DcMotor.class, motorName);
         // startup position is 0
         armMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
@@ -69,9 +69,11 @@ public class Arm {
         armMotor.setPower(direction);
 
     }
-    public void goTo(IntSupplier supplier) {
+
+    public void goTo(@NonNull IntSupplier supplier) {
         goTo(supplier.getAsInt());
     }
+
     // check if arm is at target, stopping it if it is
     public void update() {
         if (targetLevel == -1) {

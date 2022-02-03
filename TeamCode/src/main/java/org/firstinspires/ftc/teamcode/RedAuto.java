@@ -7,10 +7,11 @@ import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.teamcode.drive.SampleMecanumDrive;
-import org.firstinspires.ftc.teamcode.objectClasses.Arm;
-import org.firstinspires.ftc.teamcode.objectClasses.Carousel;
-import org.firstinspires.ftc.teamcode.objectClasses.Intake;
-import org.firstinspires.ftc.teamcode.objectClasses.LEDStrip;
+import org.firstinspires.ftc.teamcode.subsystems.Arm;
+import org.firstinspires.ftc.teamcode.subsystems.Carousel;
+import org.firstinspires.ftc.teamcode.subsystems.Intake;
+import org.firstinspires.ftc.teamcode.subsystems.LEDStrip;
+import org.firstinspires.ftc.teamcode.subsystems.ShippingElementDetector;
 import org.firstinspires.ftc.teamcode.trajectorysequence.TrajectorySequence;
 import org.openftc.easyopencv.OpenCvCamera;
 import org.openftc.easyopencv.OpenCvCameraFactory;
@@ -35,6 +36,56 @@ public class RedAuto extends OpMode {
     LEDStrip strip;
     TrajectorySequence trajSeq;
 
+    @Override
+    public void init() {
+        initRobot();
+        trajSeq = drive.trajectorySequenceBuilder(startPose)
+                .addTemporalMarker(() -> arm.goTo(3))
+                .waitSeconds(3.5)
+                .addTemporalMarker(() -> webcam.closeCameraDevice())
+                .lineToSplineHeading(new Pose2d(-34, -57, Math.toRadians(180)))
+                .addTemporalMarker(() -> carousel.redStartPower(0.5))
+                .strafeTo(new Vector2d(-55.5, -59.5))
+                .waitSeconds(2)
+                .lineToSplineHeading(new Pose2d(-13, -57, Math.toRadians(90)))
+                .addTemporalMarker(() -> {
+                            carousel.stop();
+                            arm.goTo(detector::getLocationInt);
+                        }
+                )
+                .waitSeconds(1.5)
+                .lineToConstantHeading(new Vector2d(-12, -36))
+                .addTemporalMarker(() -> intake.out(1))
+                .waitSeconds(0.5)
+                .addTemporalMarker(intake::stop)
+                .lineToConstantHeading(new Vector2d(-34, -56.5))
+                .lineToSplineHeading(new Pose2d(-56, -36, 0))
+                .addTemporalMarker(() -> {
+                    arm.goTo(0);
+                    strip.allianceSolid();
+                })
+                .build();
+    }
+
+    @Override
+    public void init_loop() {
+        strip.detected(detector.getLocation());
+        telemetry.addData("Location", detector.getLocation().name());
+    }
+
+    @Override
+    public void start() {
+        drive.followTrajectorySequenceAsync(trajSeq);
+    }
+
+    @Override
+    public void loop() {
+        strip.detected(detector.getLocation());
+        telemetry.addData("Location", detector.getLocation().name());
+        drive.update();
+        arm.update();
+    }
+
     public void initRobot() {
         drive = new SampleMecanumDrive(hardwareMap);
         drive.setPoseEstimate(startPose);
@@ -45,7 +96,8 @@ public class RedAuto extends OpMode {
         intake = new Intake(hardwareMap, "left intake", "right intake");
         carousel = new Carousel(hardwareMap, "carousel");
 
-        int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
+        int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id",
+                hardwareMap.appContext.getPackageName());
 
         webcamName = hardwareMap.get(WebcamName.class, "webcam");
         webcam = OpenCvCameraFactory.getInstance().createWebcam(webcamName, cameraMonitorViewId);
@@ -65,50 +117,5 @@ public class RedAuto extends OpMode {
         webcam.setPipeline(detector);
 
         strip = new LEDStrip(hardwareMap, "blinkin", LEDStrip.Alliance.RED);
-    }
-
-    @Override
-    public void init() {
-        initRobot();
-        arm.goTo(3);
-        trajSeq = drive.trajectorySequenceBuilder(startPose)
-                .waitSeconds(4)
-                .lineToSplineHeading(new Pose2d(-34, -57, Math.toRadians(180)))
-                .addTemporalMarker(() -> carousel.redStart())
-                .strafeTo(new Vector2d(-57, -59))
-                .waitSeconds(2)
-                .lineToSplineHeading(new Pose2d(-13, -57, Math.toRadians(90)))
-                .addTemporalMarker(() -> {
-                            carousel.stop();
-                            arm.goTo(detector::getLocationInt);
-                        }
-                )
-                .waitSeconds(1.5)
-                .lineToConstantHeading(new Vector2d(-12, -36))
-                .addTemporalMarker(() -> intake.out(1))
-                .waitSeconds(1.5)
-                .addTemporalMarker(() -> intake.stop())
-                .lineToConstantHeading(new Vector2d(-34, -56.5))
-                .lineToSplineHeading(new Pose2d(-56, -36, Math.toRadians(0)))
-                .addTemporalMarker(() -> {
-                    arm.goTo(0);
-                    strip.allianceSolid();
-                })
-                .build();
-    }
-    @Override
-    public void init_loop() {
-        strip.detected(detector.getLocation());
-        telemetry.addData("Location", detector.getLocation().name());
-        arm.update();
-    }
-    @Override
-    public void start() {
-        drive.followTrajectorySequenceAsync(trajSeq);
-    }
-    @Override
-    public void loop() {
-        drive.update();
-        arm.update();
     }
 }
