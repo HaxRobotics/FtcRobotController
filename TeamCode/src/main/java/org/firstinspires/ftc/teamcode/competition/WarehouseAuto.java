@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode;
+package org.firstinspires.ftc.teamcode.competition;
 
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.acmerobotics.roadrunner.geometry.Vector2d;
@@ -19,8 +19,8 @@ import org.openftc.easyopencv.OpenCvCamera;
 import org.openftc.easyopencv.OpenCvCameraFactory;
 import org.openftc.easyopencv.OpenCvCameraRotation;
 
-@Autonomous(name = "RED COMP WAREHOUSE")
-public class WarehouseAutoRed extends OpMode {
+@Autonomous(name = "BLUE COMP WAREHOUSE")
+public class WarehouseAuto extends OpMode {
     // declare vision variables
     int width = 352;
     int height = 288;
@@ -33,7 +33,7 @@ public class WarehouseAutoRed extends OpMode {
     WebcamName webcamName;
     OpenCvCamera webcam;
     ShippingElementDetector detector = new ShippingElementDetector(width);
-    Pose2d startPose = new Pose2d(12, -62, Math.toRadians(90));
+    Pose2d startPose = new Pose2d(12, 62, Math.toRadians(270));
     LEDStrip strip;
     TrajectorySequence trajSeq;
 
@@ -67,7 +67,7 @@ public class WarehouseAutoRed extends OpMode {
         // set opencv pipeline
         webcam.setPipeline(detector);
 
-        strip = new LEDStrip(hardwareMap, "blinkin", LEDStrip.Alliance.RED);
+        strip = new LEDStrip(hardwareMap, "blinkin", LEDStrip.Alliance.BLUE);
     }
 
     @Override
@@ -78,31 +78,31 @@ public class WarehouseAutoRed extends OpMode {
                 .waitSeconds(3.5)
                 //drive to the shipping hub
                 .addTemporalMarker(() -> webcam.stopStreaming())
-                .lineToLinearHeading(new Pose2d(12, -24, Math.toRadians(180)))
+                .lineToLinearHeading(new Pose2d(12, 24, Math.toRadians(180)))
                 //move arm to correct level
                 .addTemporalMarker(() -> arm.goTo(detector::getLocationInt))
                 .waitSeconds(1)
                 //position closer to the shipping hub
-                .lineTo(new Vector2d(1.74, -24))
+                .lineTo(new Vector2d(1.74, 24))
                 //release the preloaded block
                 .addTemporalMarker(() -> intake.out(1))
                 .waitSeconds(0.5)
                 .addTemporalMarker(() -> intake.stop())
                 //go back to start position
-                .lineToLinearHeading(new Pose2d(12, -64, Math.toRadians(90)))
+                .lineToLinearHeading(new Pose2d(12, 64, Math.toRadians(270)))
                 //strafe into warehouse
                 .setVelConstraint(new MecanumVelocityConstraint(30, 15))
                 .setAccelConstraint(new ProfileAccelerationConstraint(15))
-                .strafeTo(new Vector2d(41, -64))
+                .strafeTo(new Vector2d(41, 64))
                 .resetConstraints()
                 //lower arm to lowest level
                 .addTemporalMarker(() -> arm.goTo(0))
                 .addTemporalMarker(() -> intake.in(1))
                 .waitSeconds(1.25)
                 //drive closer to the pile of blocks
-                .lineToLinearHeading(new Pose2d(52.5, -57.5, Math.toRadians(335)))
+                .lineToLinearHeading(new Pose2d(52.5, 57.5, Math.toRadians(25)))
                 .waitSeconds(1.5)
-                .addTemporalMarker(intake::stop)
+                .addTemporalMarker(() -> intake.stop())
                 .build();
     }
 
@@ -120,6 +120,7 @@ public class WarehouseAutoRed extends OpMode {
     @Override
     public void loop() {
         strip.detected(detector.getLocation());
+        telemetry.addData("Location", detector.getLocation().name());
         drive.update();
         arm.update();
     }
