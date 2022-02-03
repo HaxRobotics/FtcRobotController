@@ -61,7 +61,6 @@ import android.widget.LinearLayout.LayoutParams;
 import android.widget.PopupMenu;
 import android.widget.TextView;
 
-import com.acmerobotics.dashboard.FtcDashboard;
 import com.google.blocks.ftcrobotcontroller.ProgrammingWebHandlers;
 import com.google.blocks.ftcrobotcontroller.runtime.BlocksOpMode;
 import com.qualcomm.ftccommon.ClassManagerFactory;
@@ -334,7 +333,6 @@ public class FtcRobotControllerActivity extends Activity
         popupMenu.inflate(R.menu.ftc_robot_controller);
         AnnotatedHooksClassFilter.getInstance().callOnCreateMenuMethods(
             FtcRobotControllerActivity.this, popupMenu.getMenu());
-        FtcDashboard.populateMenu(popupMenu.getMenu());
         popupMenu.show();
       }
     });
@@ -412,7 +410,6 @@ public class FtcRobotControllerActivity extends Activity
     checkPreferredChannel();
 
     AnnotatedHooksClassFilter.getInstance().callOnCreateMethods(this);
-    FtcDashboard.start();
   }
 
   protected UpdateUI createUpdateUI() {
@@ -486,7 +483,6 @@ public class FtcRobotControllerActivity extends Activity
     RobotLog.cancelWriteLogcatToDisk();
 
     AnnotatedHooksClassFilter.getInstance().callOnDestroyMethods(this);
-    FtcDashboard.stop();
   }
 
   protected void bindToService() {
@@ -543,7 +539,6 @@ public class FtcRobotControllerActivity extends Activity
   public boolean onCreateOptionsMenu(Menu menu) {
     getMenuInflater().inflate(R.menu.ftc_robot_controller, menu);
     AnnotatedHooksClassFilter.getInstance().callOnCreateMenuMethods(this, menu);
-    FtcDashboard.populateMenu(menu);
     return true;
   }
 
@@ -560,11 +555,7 @@ public class FtcRobotControllerActivity extends Activity
 
     RobotState robotState = robot.eventLoopManager.state;
 
-    if (robotState != RobotState.RUNNING) {
-      return false;
-    } else {
-      return true;
-    }
+      return robotState == RobotState.RUNNING;
   }
 
   @Override
@@ -712,7 +703,6 @@ public class FtcRobotControllerActivity extends Activity
 
     AnnotatedHooksClassFilter.getInstance().callWebHandlerRegistrarMethods(this,
         service.getWebServer().getWebHandlerManager());
-    FtcDashboard.attachWebServer(service.getWebServer());
   }
 
   private void updateUIAndRequestRobotSetup() {
@@ -759,7 +749,6 @@ public class FtcRobotControllerActivity extends Activity
     AndroidBoard.showErrorIfUnknownControlHub();
 
     AnnotatedHooksClassFilter.getInstance().callOnCreateEventLoopMethods(this, eventLoop);
-    FtcDashboard.attachEventLoop(eventLoop);
   }
 
   protected OpModeRegister createOpModeRegister() {
@@ -824,11 +813,7 @@ public class FtcRobotControllerActivity extends Activity
       if (key.equals(context.getString(R.string.pref_app_theme))) {
         ThemedActivity.restartForAppThemeChange(getTag(), getString(R.string.appThemeChangeRestartNotifyRC));
       } else if (key.equals(context.getString(R.string.pref_wifi_automute))) {
-        if (preferencesHelper.readBoolean(context.getString(R.string.pref_wifi_automute), false)) {
-          initWifiMute(true);
-        } else {
-          initWifiMute(false);
-        }
+          initWifiMute(preferencesHelper.readBoolean(context.getString(R.string.pref_wifi_automute), false));
       }
     }
   }
