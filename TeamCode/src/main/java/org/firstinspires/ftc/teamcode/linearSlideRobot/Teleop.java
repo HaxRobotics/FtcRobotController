@@ -4,6 +4,7 @@ import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Servo;
 
 import org.firstinspires.ftc.teamcode.HolonomicDrive;
@@ -18,75 +19,91 @@ public class Teleop extends OpMode {
     HolonomicDrive drive;
 
     // declare drive motors
-    /*DcMotor frontLeftDrive;
+    DcMotor frontLeftDrive;
     DcMotor frontRightDrive;
     DcMotor backLeftDrive;
     DcMotor backRightDrive;
 
     // declare drive multipliers
-    double frontLeftPower = .2;
-    double frontRightPower = .2;
-    double backLeftPower = .2;
-    double backRightPower = .2; */
+    double frontLeftPower = .6;
+    double frontRightPower = .6;
+    double backLeftPower = .6;
+    double backRightPower = .6;
 
     // declare linear slide motor
     DcMotor linearSlide;
     // declare linear slide elevator servo
-    Servo linearSlideElevator;
+    //Servo linearSlideElevator;
     // declare intake servo
-    CRServo intakeServo;
+    CRServo clawServo;
+    //declare the middle intake servo
+    Servo middleIntakeServo;
+    //declare the outer intake servo
+    Servo outerIntakeServo;
     // declare duck spin motor
     DcMotor duckMotor;
+    //declare linear slide elevator motor
+    DcMotor elevatorMotor;
 
     // declare booleans for elevator toggle
-    public boolean isY = false;
+    /*public boolean isY = false;
     public boolean wasY = false;
-    public boolean elevatorOn = false;
+    public boolean elevatorOn = false;*/
 
     // declare linear slide motor powers
-    final double EXTEND_POWER = .5;
-    final double RETRACT_POWER = -.5;
+    final double EXTEND_POWER = 1;
+    final double RETRACT_POWER = -1;
 
     // initializes all hardware components
     public void init(){
         // initialize drive motors
-       /* frontLeftDrive = hardwareMap.get(DcMotor.class, "frontLeftDrive");
+        frontLeftDrive = hardwareMap.get(DcMotor.class, "frontLeftDrive");
         frontRightDrive = hardwareMap.get(DcMotor.class, "frontRightDrive");
         backLeftDrive = hardwareMap.get(DcMotor.class, "backLeftDrive");
-        backRightDrive = hardwareMap.get(DcMotor.class, "backRightDrive"); */
-
+        backRightDrive = hardwareMap.get(DcMotor.class, "backRightDrive");
+        frontLeftDrive.setDirection(DcMotorSimple.Direction.REVERSE);
+        backLeftDrive.setDirection(DcMotorSimple.Direction.REVERSE);
         // initialize drive obj
-       // drive = new HolonomicDrive(frontLeftDrive, frontRightDrive, backLeftDrive, backRightDrive, frontLeftPower, frontRightPower, backLeftPower, backRightPower);
+       drive = new HolonomicDrive(frontLeftDrive, frontRightDrive, backLeftDrive, backRightDrive, frontLeftPower, frontRightPower, backLeftPower, backRightPower);
 
         // initialize linear slide motor
         linearSlide = hardwareMap.get(DcMotor.class, "linearSlide");
+        linearSlide.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         // initialize linear slide elevator servo
-        linearSlideElevator = hardwareMap.get(Servo.class, "linearSlideElevator");
+        //linearSlideElevator = hardwareMap.get(Servo.class, "linearSlideElevator");
         // initialize intake CRServo
-        intakeServo = hardwareMap.crservo.get("intakeServo");
+        clawServo = hardwareMap.crservo.get("intakeServo");
+        //initialize middle intake servo
+        middleIntakeServo = hardwareMap.get(Servo.class, "middleIntakeServo");
+        //initialize outer intake servo
+        outerIntakeServo = hardwareMap.get(Servo.class, "outerIntakeServo");
         // initialize duck spin motor
         duckMotor = hardwareMap.get(DcMotor.class, "duckMotor");
+        //initialize linear slide elevator motor
+        elevatorMotor = hardwareMap.get(DcMotor.class, "elevatorMotor");
+        elevatorMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
     }
 
     // calls all methods
     public void loop(){
-       // drive();
+        drive();
         linearSlide();
-        linearSlideElevator();
+        //linearSlideElevator();
+        elevatorMotor();
         intake();
         duck();
     }
 
     // control drive motors
-    /*public void drive() {
+    public void drive() {
         // set the driver's sticks to correspond with the drive method
         // left stick y = forward/backward; left stick x = strafing; right stick x = turning
         double forwardPower = Math.abs(gamepad1.left_stick_y) < THRESHOLD ? 0 : gamepad1.left_stick_y;
         double strafePower = Math.abs(gamepad1.left_stick_x) < THRESHOLD ? 0 : gamepad1.left_stick_x;
         double turnPower = Math.abs(gamepad1.right_stick_x) < THRESHOLD ? 0 : gamepad1.right_stick_x;
 
-        drive.drive(forwardPower, strafePower, turnPower);
-    } */
+        drive.drive(forwardPower, strafePower, -turnPower);
+    }
 
     // control linear slide motor
     public void linearSlide() {
@@ -101,7 +118,7 @@ public class Teleop extends OpMode {
     }
 
     // controls linear slide's elevation
-    public void linearSlideElevator() {
+   /* public void linearSlideElevator() {
         // track history of driver's y button
         if((isY = gamepad1.y) && !wasY) {
             if(elevatorOn) {
@@ -114,28 +131,57 @@ public class Teleop extends OpMode {
             elevatorOn = !elevatorOn;
         }
         wasY = isY;
-    }
+    } */
 
     // controls intake system
     public void intake() {
         // checks if driver's b/x buttons are pressed and sets crservo power accordingly
         if (gamepad1.b) {
-            intakeServo.setPower(1);
+            clawServo.setPower(1);
         } else if (gamepad1.x) {
-            intakeServo.setPower(-1);
+            clawServo.setPower(-1);
         } else {
-            intakeServo.setPower(0);
+            clawServo.setPower(0);
         }
+        //if y is pressed, rotate intake towards outtake side
+        if (gamepad1.y) {
+            middleIntakeServo.setPosition(0);
+            outerIntakeServo.setPosition(0);
+        }
+        //if a is pressed, rotate intake towards intake side
+        else if (gamepad1.a) {
+            middleIntakeServo.setPosition(.4);
+            outerIntakeServo.setPosition(.4);
+        }
+        
+
+    }
+
+    //controls linear slide elevator motor
+    public void elevatorMotor() {
+        if (gamepad1.right_trigger > .12) {
+            elevatorMotor.setPower(.6);
+        } else if (gamepad1.left_trigger > .12) {
+            elevatorMotor.setPower((-.6));
+        } else {
+            elevatorMotor.setPower(0);
+        }
+
     }
 
     // controls the duck spinning system
     public void duck()  {
         // checks if a button is pressed and sets the duck motor power accordingly
-        if (gamepad1.a) {
+        if (gamepad1.dpad_up) {
             duckMotor.setPower(1);
+        } else if (gamepad1.dpad_down){
+            duckMotor.setPower(-1);
         }
+        // if button is not pressed, set the motor power to 0
         else {
             duckMotor.setPower(0);
         }
     }
 }
+
+
