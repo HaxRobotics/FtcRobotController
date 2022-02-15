@@ -63,6 +63,10 @@ public class Teleop extends OpMode {
         backRightDrive = hardwareMap.get(DcMotor.class, "backRightDrive");
         frontLeftDrive.setDirection(DcMotorSimple.Direction.REVERSE);
         backLeftDrive.setDirection(DcMotorSimple.Direction.REVERSE);
+        frontLeftDrive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        frontRightDrive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        backLeftDrive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        backRightDrive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         // initialize drive obj
        drive = new HolonomicDrive(frontLeftDrive, frontRightDrive, backLeftDrive, backRightDrive, frontLeftPower, frontRightPower, backLeftPower, backRightPower);
 
