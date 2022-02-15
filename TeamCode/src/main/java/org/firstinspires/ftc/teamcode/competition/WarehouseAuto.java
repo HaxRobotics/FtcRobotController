@@ -45,6 +45,7 @@ public class WarehouseAuto extends OpMode {
         // add encoder levels to arm
         arm.addLevel(0).addLevel(410).addLevel(940).addLevel(1530);
         intake = new Intake(hardwareMap, "left intake", "right intake");
+
         carousel = new Carousel(hardwareMap, "carousel");
 
         int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id",
@@ -83,7 +84,7 @@ public class WarehouseAuto extends OpMode {
                 .addTemporalMarker(() -> arm.goTo(detector::getLocationInt))
                 .waitSeconds(1)
                 //position closer to the shipping hub
-                .lineTo(new Vector2d(1.74, 24))
+                .lineTo(new Vector2d(2.3, 24))
                 //release the preloaded block
                 .addTemporalMarker(() -> intake.out(1))
                 .waitSeconds(0.5)

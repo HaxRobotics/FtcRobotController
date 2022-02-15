@@ -9,6 +9,10 @@ import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.teamcode.drive.StandardTrackingWheelLocalizer;
+import org.firstinspires.ftc.teamcode.gamepad.ButtonReader;
+import org.firstinspires.ftc.teamcode.gamepad.GamepadEx;
+import org.firstinspires.ftc.teamcode.gamepad.GamepadKeys;
+import org.firstinspires.ftc.teamcode.gamepad.ToggleButtonReader;
 import org.firstinspires.ftc.teamcode.subsystems.Arm;
 import org.firstinspires.ftc.teamcode.subsystems.Carousel;
 import org.firstinspires.ftc.teamcode.subsystems.DriveTrain;
@@ -35,9 +39,12 @@ public class FirstFullTeleOp extends OpMode {
     CRServo hook;
     ShippingElementDetector detector;
     OpenCvCamera webcam;
+    GamepadEx gamepad2Ex;
     double multiplier = 0.8;
     private boolean isSlow = false;
     private boolean wasSlow = false;
+    ButtonReader dpadLeft;
+    ButtonReader dpadRight;
     @Override
     public void init() {
         arm = new Arm(hardwareMap, "arm");
@@ -56,8 +63,15 @@ public class FirstFullTeleOp extends OpMode {
 
         strip = new LEDStrip(hardwareMap, "blinkin", LEDStrip.Alliance.RED);
         strip.allianceSolid();
+
         localizer = new StandardTrackingWheelLocalizer(hardwareMap);
         localizer.setPoseEstimate(new Pose2d(12, 62, Math.toRadians(270)));
+
+        hook = hardwareMap.get(CRServo.class, "hook");
+
+        gamepad2Ex = new GamepadEx(gamepad2);
+        dpadLeft = new ButtonReader(gamepad2Ex, GamepadKeys.Button.DPAD_LEFT);
+        dpadRight = new ButtonReader(gamepad2Ex, GamepadKeys.Button.DPAD_RIGHT);
         detector = new ShippingElementDetector(width);
 
         int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id",
@@ -81,17 +95,19 @@ public class FirstFullTeleOp extends OpMode {
         webcam.setPipeline(detector);
 
         dashboard = FtcDashboard.getInstance();
-        hook = hardwareMap.get(CRServo.class, "hook");
     }
 
     @Override
     public void loop() {
         telemetry.addData("Location", detector.getLocation().name());
+        telemetry.addData("Carousel RPM", carousel.getToggleSpeed());
         // LED control
         if (gamepad1.left_stick_button) {
             strip.alliance = LEDStrip.Alliance.BLUE;
+            strip.allianceSolid();
         } else if (gamepad1.right_stick_button) {
             strip.alliance = LEDStrip.Alliance.RED;
+            strip.allianceSolid();
         } else if (gamepad1.dpad_up) {
             strip.setPattern(RevBlinkinLedDriver.BlinkinPattern.BLACK);
         }
@@ -143,12 +159,18 @@ public class FirstFullTeleOp extends OpMode {
         } else {
             carousel.stop();
         }
+        if (dpadLeft.wasJustPressed()) {
+            carousel.setToggleSpeed(carousel.getToggleSpeed() - 10);
+        } else if (dpadRight.wasJustPressed()) {
+            carousel.setToggleSpeed(carousel.getToggleSpeed() + 10);
+        }
 
         // slow mode
         if ((isSlow = gamepad1.dpad_down) && !wasSlow) {
-            multiplier = multiplier == 0.4 ? 0.8 : 0.4;
+            multiplier = multiplier == 0.5 ? 1 : 0.5;
         }
         wasSlow = isSlow;
+
         // Shipping element
         if (gamepad2.dpad_up) {
             hook.setPower(-1);
@@ -167,5 +189,8 @@ public class FirstFullTeleOp extends OpMode {
             strip.allianceBlink();
             first = false;
         }
+
+        dpadRight.readValue();
+        dpadLeft.readValue();
     }
 }

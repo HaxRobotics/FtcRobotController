@@ -11,19 +11,27 @@ public class Carousel {
     public final DcMotorEx carouselMotor;
     private double toggleSpeed;
 
+    public static final double ticksPerRev = 537.6;
+
     public Carousel(@NonNull HardwareMap hw, String motorName) {
         carouselMotor = hw.get(DcMotorEx.class, motorName);
         carouselMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         carouselMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        toggleSpeed = 2040;
+        toggleSpeed = 200;
+
     }
 
+    private double rpmToTicks(double rpm) {
+        return (rpm / 60) * ticksPerRev;
+    }
+
+
     public void start() {
-        carouselMotor.setVelocity(toggleSpeed);
+        carouselMotor.setVelocity(rpmToTicks(toggleSpeed));
     }
 
     public void redStart() {
-        carouselMotor.setVelocity(-toggleSpeed);
+        carouselMotor.setVelocity(-rpmToTicks(toggleSpeed));
     }
 
     public void startPower(double power) {

@@ -45,7 +45,7 @@ public class RedAuto extends OpMode {
                 .addTemporalMarker(() -> webcam.closeCameraDevice())
                 .lineToSplineHeading(new Pose2d(-34, -57, Math.toRadians(180)))
                 .addTemporalMarker(() -> carousel.redStartPower(0.5))
-                .strafeTo(new Vector2d(-55.5, -59.5))
+                .strafeTo(new Vector2d(-56, -59.5))
                 .waitSeconds(2)
                 .lineToSplineHeading(new Pose2d(-13, -57, Math.toRadians(90)))
                 .addTemporalMarker(() -> {
