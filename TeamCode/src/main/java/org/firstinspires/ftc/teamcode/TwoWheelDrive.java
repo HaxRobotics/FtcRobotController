@@ -24,8 +24,8 @@ public class TwoWheelDrive extends OpMode {
         double linearPower;
         double turnPower;
 
-        linearPower = gamepad1.left_stick_y;
-        turnPower = gamepad1.right_stick_x;
+        linearPower = -gamepad1.left_stick_y;
+        turnPower = -gamepad1.right_stick_x;
 
         leftMotor.setPower((linearPower) + (turnPower));
         rightMotor.setPower((linearPower) - (turnPower));
@@ -33,7 +33,7 @@ public class TwoWheelDrive extends OpMode {
         if (gamepad1.right_bumper) {
             intakeMotor.setPower(1);
         } else if (gamepad1.left_bumper) {
-            intakeMotor.setPower(-1);
+            intakeMotor.setPower(-.6);
         } else {
             intakeMotor.setPower(0);
         }
