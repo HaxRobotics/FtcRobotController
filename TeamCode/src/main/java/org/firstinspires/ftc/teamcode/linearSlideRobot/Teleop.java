@@ -42,8 +42,8 @@ public class Teleop extends OpMode {
     Servo outerIntakeServo;
     // declare duck spin motor
     DcMotor duckMotor;
-    //declare linear slide elevator motor
-    DcMotor elevatorMotor;
+    //declare linear slide elevator servo
+    CRServo elevatorServo;
 
     // declare booleans for elevator toggle
     /*public boolean isY = false;
@@ -84,8 +84,7 @@ public class Teleop extends OpMode {
         // initialize duck spin motor
         duckMotor = hardwareMap.get(DcMotor.class, "duckMotor");
         //initialize linear slide elevator motor
-        elevatorMotor = hardwareMap.get(DcMotor.class, "elevatorMotor");
-        elevatorMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        elevatorServo = hardwareMap.get(CRServo.class, "elevatorMotor");
     }
 
     // calls all methods
@@ -93,7 +92,7 @@ public class Teleop extends OpMode {
         drive();
         linearSlide();
         //linearSlideElevator();
-        elevatorMotor();
+        elevatorServo();
         intake();
         duck();
     }
@@ -162,13 +161,13 @@ public class Teleop extends OpMode {
     }
 
     //controls linear slide elevator motor
-    public void elevatorMotor() {
+    public void elevatorServo() {
         if (gamepad1.right_trigger > .12) {
-            elevatorMotor.setPower(.6);
+            elevatorServo.setPower(1);
         } else if (gamepad1.left_trigger > .12) {
-            elevatorMotor.setPower((-.6));
+            elevatorServo.setPower((-1));
         } else {
-            elevatorMotor.setPower(0);
+            elevatorServo.setPower(0);
         }
 
     }
