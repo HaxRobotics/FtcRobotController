@@ -59,7 +59,7 @@ public class BlueAuto extends OpMode {
                 .waitSeconds(0.5)
                 .addTemporalMarker(intake::stop)
                 .lineToConstantHeading(new Vector2d(-34, 56.5))
-                .lineToSplineHeading(new Pose2d(-56, 36, 0))
+                .lineToSplineHeading(new Pose2d(-59, 34, 0))
                 .addTemporalMarker(() -> {
                     arm.goTo(0);
                     strip.allianceSolid();

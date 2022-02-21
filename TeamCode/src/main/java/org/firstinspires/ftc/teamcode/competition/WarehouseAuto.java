@@ -79,7 +79,7 @@ public class WarehouseAuto extends OpMode {
                 .waitSeconds(3.5)
                 //drive to the shipping hub
                 .addTemporalMarker(() -> webcam.stopStreaming())
-                .lineToLinearHeading(new Pose2d(12, 24, Math.toRadians(180)))
+                .lineToLinearHeading(new Pose2d(11, 24, Math.toRadians(180)))
                 //move arm to correct level
                 .addTemporalMarker(() -> arm.goTo(detector::getLocationInt))
                 .waitSeconds(1)

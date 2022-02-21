@@ -7,12 +7,12 @@ import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
+
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.teamcode.drive.StandardTrackingWheelLocalizer;
 import org.firstinspires.ftc.teamcode.gamepad.ButtonReader;
 import org.firstinspires.ftc.teamcode.gamepad.GamepadEx;
 import org.firstinspires.ftc.teamcode.gamepad.GamepadKeys;
-import org.firstinspires.ftc.teamcode.gamepad.ToggleButtonReader;
 import org.firstinspires.ftc.teamcode.subsystems.Arm;
 import org.firstinspires.ftc.teamcode.subsystems.Carousel;
 import org.firstinspires.ftc.teamcode.subsystems.DriveTrain;
@@ -40,11 +40,12 @@ public class FirstFullTeleOp extends OpMode {
     ShippingElementDetector detector;
     OpenCvCamera webcam;
     GamepadEx gamepad2Ex;
-    double multiplier = 0.8;
-    private boolean isSlow = false;
-    private boolean wasSlow = false;
+    double multiplier = 1;
     ButtonReader dpadLeft;
     ButtonReader dpadRight;
+    private boolean isSlow = false;
+    private boolean wasSlow = false;
+
     @Override
     public void init() {
         arm = new Arm(hardwareMap, "arm");
